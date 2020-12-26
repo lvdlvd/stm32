@@ -20,6 +20,7 @@ type Device struct {
 	Version         string        `xml:"version"`
 	Description     string        `xml:"description"`
 	AddressUnitBits number        `xml:"addressUnitBits"`
+	CpuName         string        `xml:"cpu>name"`
 	Width           number        `xml:"width"`
 	Size            number        `xml:"size"`       // peripheral register default
 	ResetValue      number        `xml:"resetValue"` // peripheral register default
@@ -193,6 +194,8 @@ var tmplfuncs = template.FuncMap{
 	"upper": strings.ToUpper,
 }
 
+func cleanws(s *string) { *s = strings.Join(strings.Fields(*s), " ") }
+
 var fDebug = flag.Bool("d", false, "dump parsed device struct")
 
 func main() {
@@ -242,17 +245,17 @@ func main() {
 	// Cleanup whitespace in description fields, sort
 	sort.Sort(byName(device.Peripherals))
 	for _, v := range device.Peripherals {
-		v.Description = strings.Join(strings.Fields(v.Description), " ")
+		cleanws(&v.Description)
 
 		sort.Sort(byValue(v.Interrupts))
 		for _, w := range v.Interrupts {
-			w.Description = strings.Join(strings.Fields(w.Description), " ")
+			cleanws(&w.Description)
 		}
 		device.Interrupts = append(device.Interrupts, v.Interrupts...)
 
 		sort.Sort(byAddressOffset(v.Registers))
 		for _, w := range v.Registers {
-			w.Description = strings.Join(strings.Fields(w.Description), " ")
+			cleanws(&w.Description)
 
 			if len(w.Fields) == 0 {
 				continue
@@ -280,10 +283,8 @@ func main() {
 			}
 
 			for _, x := range w.Fields {
-				x.Description = strings.Join(strings.Fields(x.Description), " ")
-
+				cleanws(&x.Description)
 				index[v.Name+"::"+w.Name] += x.String()
-
 			}
 		}
 	}
@@ -301,61 +302,19 @@ func main() {
 		revindex[v] = append(revindex[v], k)
 	}
 
-	// for k, v := range revindex {
-	// 	if len(v) > 1 {
-	// 		fmt.Println(k, v)
-	// 	}
-	// }
-	// log.Fatal()
-
-	var timers []*Peripheral
-	for _, v := range device.Peripherals {
-		if v.DerivedFrom == "" && nameTemplate(v.Name) == nameTemplate("TIM1") {
-			timers = append(timers, v)
-			log.Println("timer: ", v.Name)
-		}
-	}
-
-	var basicTimer = timers[0]
-	for _, v := range timers[1:] {
-		log.Println("adding", v.Name)
-		basicTimer = intersectType(basicTimer, v)
-	}
-	basicTimer.Name = "BasicTimer"
-	basicTimer.Description = "intersection of all timers"
-	device.Peripherals = append(device.Peripherals, basicTimer)
-
-	if false {
-		var uarts []*Peripheral
-		for _, v := range device.Peripherals {
-			if v.DerivedFrom != "" {
+	for k1, v1 := range device.Peripherals {
+		for k2, v2 := range device.Peripherals {
+			if k1 == k2 {
 				continue
 			}
-			if n := nameTemplate(v.Name); n == nameTemplate("USART1") || n == nameTemplate("UART1") {
-				uarts = append(uarts, v)
-				log.Println("uart: ", v.Name)
+			if v2.DerivedFrom != "" {
+				continue
 			}
-		}
-		var basicUart = uarts[0]
-		for _, v := range uarts[1:] {
-			log.Println("adding", v.Name)
-			basicUart = intersectType(basicUart, v)
-		}
-		basicUart.Name = "BasicUart"
-		basicUart.Description = "intersection of all uarts"
-		device.Peripherals = append(device.Peripherals, basicUart)
-	}
-
-	if true {
-		for k1, v1 := range device.Peripherals {
-			for k2, v2 := range device.Peripherals {
-				if k1 == k2 {
-					continue
-				}
-				if v2.DerivedFrom != "" {
-					continue
-				}
+			if isSuperset(v1, v2) {
 				if isSuperset(v1, v2) {
+					log.Printf("%s is identical to %s", v1.Name, v2.Name)
+					v2.DerivedFrom = v1.Name
+				} else {
 					log.Printf("%s is super type of %s", v1.Name, v2.Name)
 					v1.Extends = append(v1.Extends, v2)
 				}
@@ -370,45 +329,6 @@ func main() {
 	if err := tmpl.Execute(os.Stdout, &device); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func intersectType(a, b *Peripheral) *Peripheral {
-	p := &Peripheral{}
-	for _, v := range a.Registers {
-		vv := b.RegisterByName(v.Name)
-		if vv == nil {
-			continue
-		}
-		if vv.AddressOffset != v.AddressOffset {
-			continue
-		}
-		if vv.Size != v.Size {
-			continue
-		}
-
-		r := &Register{Name: v.Name, Description: v.Description, AddressOffset: v.AddressOffset, Size: v.Size}
-		for _, fs := range v.Fields {
-			fb := vv.FieldByName(fs.Name)
-			if fb == nil {
-				continue
-			}
-			if fb.BitOffset != fs.BitOffset {
-				continue
-			}
-			if fb.BitWidth != fs.BitWidth {
-				continue
-			}
-			r.Fields = append(r.Fields, fs)
-		}
-
-		if len(r.Fields) > 0 {
-			p.Registers = append(p.Registers, r)
-		}
-	}
-	if len(p.Registers) > 0 {
-		return p
-	}
-	return nil
 }
 
 func isSuperset(big, small *Peripheral) bool {
