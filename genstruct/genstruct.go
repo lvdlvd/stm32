@@ -38,6 +38,14 @@ func (d *Device) PeripheralByName(s string) *Peripheral {
 	return nil
 }
 
+func (d *Device) PeripheralType(s string) *Peripheral {
+	p := d.PeripheralByName(s)
+	if p.DerivedFrom != "" {
+		return d.PeripheralType(p.DerivedFrom)
+	}
+	return p
+}
+
 type Peripheral struct {
 	Name             string        `xml:"name"`
 	DerivedFrom      string        `xml:"derivedFrom,attr"` // same type as this device
@@ -205,7 +213,7 @@ func main() {
 	flag.Parse()
 
 	if len(flag.Args()) != 2 {
-		log.Fatalf("Usage: %s path/to/lang.tmpl path/to/dialect.xml", os.Args[0])
+		log.Fatalf("Usage: %s path/to/lang.tmpl path/to/stm32xxxx.svd", os.Args[0])
 	}
 
 	tmpl, err := template.New(filepath.Base(flag.Arg(0))).Funcs(tmplfuncs).ParseFiles(flag.Arg(0))
@@ -314,6 +322,7 @@ func main() {
 				if isSuperset(v1, v2) {
 					log.Printf("%s is identical to %s", v1.Name, v2.Name)
 					v2.DerivedFrom = v1.Name
+					v2.Registers = nil
 				} else {
 					log.Printf("%s is super type of %s", v1.Name, v2.Name)
 					v1.Extends = append(v1.Extends, v2)
@@ -323,7 +332,12 @@ func main() {
 	}
 
 	for _, v := range device.Peripherals {
-		v.FillRegisters()
+		if vv := device.PeripheralType(v.Name); vv != v {
+			v.DerivedFrom = vv.Name
+			v.Registers = nil
+		} else {
+			v.FillRegisters()
+		}
 	}
 
 	if err := tmpl.Execute(os.Stdout, &device); err != nil {
