@@ -1,7 +1,11 @@
+#include "{{.CpuName}}.h"
+#include "{{.Name | lower}}.h"
+
 extern void _estack(void);              // fake definition, will be filled in by linker script.
 
 void default_IRQ_Handler(void) {
-    for(;;);
+    for(;;)
+        __NOP();
 }
 
 
@@ -46,6 +50,6 @@ __attribute__((section(".isr_vector"))) void (*vector_table[])(void) = {
     SysTick_Handler,
     
 {{- range .Interrupts}}
-    [{{.Value}}+16] = {{.Name}}_Handler,
+    [16+IRQ_{{.Name}}] = {{.Name}}_Handler,  // {{.Value}} {{.Description}}
 {{- end}}
 };

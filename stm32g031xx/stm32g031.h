@@ -9,21 +9,21 @@ enum IRQn_Type {
 	None_IRQn  = -16, // 0 position of estack reset pointer
 	Reset_IRQn = -15, // 1 Reset, not a real IRQ           
 
-	//  Cortex-M3 Processor Exceptions Numbers 
+	//  Cortex-M0 Processor Exceptions Numbers 
 	NonMaskableInt_IRQn   = -14, // 2 Non Maskable Interrupt                           
 	Reserved_3_IRQn       = -13,
-	MemoryManagement_IRQn = -12, // 4 Cortex-M3 Memory Management Interrupt            
-	BusFault_IRQn         = -11, // 5 Cortex-M3 Bus Fault Interrupt                    
-	UsageFault_IRQn       = -10, // 6 Cortex-M3 Usage Fault Interrupt                  
+	MemoryManagement_IRQn = -12, // 4 Cortex-M0 Memory Management Interrupt            
+	BusFault_IRQn         = -11, // 5 Cortex-M0 Bus Fault Interrupt                    
+	UsageFault_IRQn       = -10, // 6 Cortex-M0 Usage Fault Interrupt                  
 	Reserved_7_IRQn       = -9,
 	Reserved_8_IRQn       = -8,
 	Reserved_9_IRQn       = -7,
 	Reserved_10_IRQn      = -6,
-	SVCall_IRQn           = -5, // 11 Cortex-M3 SV Call Interrupt                     
-	DebugMonitor_IRQn     = -4, // 12 Cortex-M3 Debug Monitor Interrupt               
+	SVCall_IRQn           = -5, // 11 Cortex-M0 SV Call Interrupt                     
+	DebugMonitor_IRQn     = -4, // 12 Cortex-M0 Debug Monitor Interrupt               
 	Reserved_13_IRQn      = -3,
-	PendSV_IRQn           = -2, // 14 Cortex-M3 Pend SV Interrupt                     
-	SysTick_IRQn          = -1, // 15 Cortex-M3 System Tick Interrupt                 
+	PendSV_IRQn           = -2, // 14 Cortex-M0 Pend SV Interrupt                     
+	SysTick_IRQn          = -1, // 15 Cortex-M0 System Tick Interrupt                 
 
 	//  Device specific Interrupt Numbers
 	IRQ_WWDG = 0, // Window watchdog interrupt

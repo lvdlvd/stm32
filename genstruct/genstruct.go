@@ -296,7 +296,24 @@ func main() {
 			}
 		}
 	}
-	sort.Sort(byValue(device.Interrupts))
+
+	if len(device.Interrupts) > 0 {
+		sort.Sort(byValue(device.Interrupts))
+		vv := device.Interrupts[:1]
+		for _, v := range device.Interrupts[1:] {
+			if v.Value != vv[len(vv)-1].Value {
+				vv = append(vv, v)
+			}
+			if v.Name != vv[len(vv)-1].Name {
+				log.Printf("Conflicting interrupt definitions %v and %v", v, vv[len(vv)-1])
+			} else {
+				//log.Printf("Duplicate interrupt definition %v", v)
+			}
+		}
+		device.Interrupts = vv
+	} else {
+		log.Println("No interrupts defined.")
+	}
 
 	if *fDebug {
 		enc := json.NewEncoder(os.Stdout)
@@ -305,10 +322,10 @@ func main() {
 		return
 	}
 
-	revindex := map[string][]string{}
-	for k, v := range index {
-		revindex[v] = append(revindex[v], k)
-	}
+	// revindex := map[string][]string{}
+	// for k, v := range index {
+	// 	revindex[v] = append(revindex[v], k)
+	// }
 
 	for k1, v1 := range device.Peripherals {
 		for k2, v2 := range device.Peripherals {
