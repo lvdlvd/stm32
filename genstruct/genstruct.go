@@ -26,7 +26,7 @@ type Device struct {
 	ResetValue      number        `xml:"resetValue"` // peripheral register default
 	ResetMask       number        `xml:"resetMask"`  // peripheral register default
 	Peripherals     []*Peripheral `xml:"peripherals>peripheral"`
-	Interrupts      []*Interrupt  // created from the peripherals
+	Interrupts      []*Interrupt  `xml:"interrupt"` // global as well as created from the peripherals
 }
 
 func (d *Device) PeripheralByName(s string) *Peripheral {
@@ -44,6 +44,19 @@ func (d *Device) PeripheralType(s string) *Peripheral {
 		return d.PeripheralType(p.DerivedFrom)
 	}
 	return p
+}
+
+var renameMap = map[string]string{"UART4": "USART", "CAN1": "CAN"}
+
+func (d *Device) TypeName(s string) string {
+	n := d.PeripheralType(s)
+	if n == nil {
+		return "<NONE>"
+	}
+	if m, ok := renameMap[n.Name]; ok {
+		return m
+	}
+	return n.Name
 }
 
 type Peripheral struct {
@@ -204,7 +217,9 @@ var tmplfuncs = template.FuncMap{
 
 func cleanws(s *string) { *s = strings.Join(strings.Fields(*s), " ") }
 
-var fDebug = flag.Bool("d", false, "dump parsed device struct")
+var (
+	fDebug = flag.Bool("d", false, "dump parsed device struct")
+)
 
 func main() {
 
@@ -336,12 +351,12 @@ func main() {
 				continue
 			}
 			if isSuperset(v1, v2) {
-				if isSuperset(v1, v2) {
+				if isSuperset(v2, v1) {
 					log.Printf("%s is identical to %s", v1.Name, v2.Name)
 					v2.DerivedFrom = v1.Name
 					v2.Registers = nil
 				} else {
-					log.Printf("%s is super type of %s", v1.Name, v2.Name)
+					log.Printf("%s is derived type of base type %s", v1.Name, v2.Name)
 					v1.Extends = append(v1.Extends, v2)
 				}
 			}
@@ -362,6 +377,7 @@ func main() {
 	}
 }
 
+// if the big has all the registers and all the bits of the small
 func isSuperset(big, small *Peripheral) bool {
 	for _, v := range small.Registers {
 		vv := big.RegisterByName(v.Name)
