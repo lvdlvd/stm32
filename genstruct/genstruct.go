@@ -102,7 +102,7 @@ func (p *Peripheral) FillRegisters() {
 		}
 
 		if v.AddressOffset%(v.Size/8) != 0 {
-			log.Fatalln("Unaligned field %s:%s [%d] at %d bit", p.Name, v.Name, v.Size, v.AddressOffset)
+			log.Fatalf("Unaligned field %s:%s [%d] at %d bit", p.Name, v.Name, v.Size, v.AddressOffset)
 		}
 
 		gap := int64(v.AddressOffset) - offset
@@ -224,7 +224,7 @@ var (
 func main() {
 
 	log.SetFlags(0)
-	log.SetPrefix("svdgen: ")
+	log.SetPrefix("genstruct: ")
 	flag.Parse()
 
 	if len(flag.Args()) != 2 {
