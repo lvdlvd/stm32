@@ -36,7 +36,7 @@ void main(void) {
 
     for(;;) {
     	led0_toggle();
-    	delay(1000*1000);
+    	delay(500*1000);
     }
 
 

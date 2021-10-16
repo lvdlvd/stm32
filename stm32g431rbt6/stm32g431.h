@@ -9421,74 +9421,74 @@ inline uint32_t wwdg_winr_get_win(struct WWDG_Type* p) { return (p->WINR & WWDG_
 #undef __O
 #undef __IO
 
-struct ADC1_Type          ADC1;          // @0x50000000
-struct ADC12_Common_Type  ADC12_Common;  // @0x50000200
-struct ADC1_Type          ADC2;          // @0x50000100
-struct ADC12_Common_Type  ADC345_Common; // @0x50000700
-struct AES_Type           AES;           // @0x50060000
-struct COMP_Type          COMP;          // @0x40010200
-struct CORDIC_Type        CORDIC;        // @0x40020C00
-struct CRC_Type           CRC;           // @0x40023000
-struct CRS_Type           CRS;           // @0x40002000
-struct DAC1_Type          DAC1;          // @0x50000800
-struct DAC1_Type          DAC2;          // @0x50000C00
-struct DAC1_Type          DAC3;          // @0x50001000
-struct DAC1_Type          DAC4;          // @0x50001400
-struct DBGMCU_Type        DBGMCU;        // @0xE0042000
-struct DMA1_Type          DMA1;          // @0x40020000
-struct DMA1_Type          DMA2;          // @0x40020400
-struct DMAMUX_Type        DMAMUX;        // @0x40020800
-struct EXTI_Type          EXTI;          // @0x40010400
-struct FDCAN_Type         FDCAN;         // @0x4000A400
-struct FDCAN_Type         FDCAN1;        // @0x40006400
-struct FLASH_Type         FLASH;         // @0x40022000
-struct FMAC_Type          FMAC;          // @0x40021400
-struct FPU_Type           FPU;           // @0xE000EF34
-struct FPU_CPACR_Type     FPU_CPACR;     // @0xE000EF08
-struct GPIOA_Type         GPIOA;         // @0x48000000
-struct GPIOA_Type         GPIOB;         // @0x48000400
-struct GPIOA_Type         GPIOC;         // @0x48000800
-struct GPIOA_Type         GPIOD;         // @0x48000C00
-struct GPIOA_Type         GPIOE;         // @0x48001000
-struct GPIOA_Type         GPIOF;         // @0x48001400
-struct GPIOA_Type         GPIOG;         // @0x48001800
-struct I2C1_Type          I2C1;          // @0x40005400
-struct I2C1_Type          I2C2;          // @0x40005800
-struct I2C1_Type          I2C3;          // @0x40007800
-struct IWDG_Type          IWDG;          // @0x40003000
-struct LPTIMER1_Type      LPTIMER1;      // @0x40007C00
-struct LPUART1_Type       LPUART1;       // @0x40008000
-struct MPU_Type           MPU;           // @0xE000E084
-struct NVIC_Type          NVIC;          // @0xE000E100
-struct OPAMP_Type         OPAMP;         // @0x40010300
-struct PWR_Type           PWR;           // @0x40007000
-struct RCC_Type           RCC;           // @0x40021000
-struct RNG_Type           RNG;           // @0x50060800
-struct RTC_Type           RTC;           // @0x40002800
-struct SAI_Type           SAI;           // @0x40015400
-struct SCB_Type           SCB;           // @0xE000E040
-struct SCB_ACTRL_Type     SCB_ACTRL;     // @0xE000E008
-struct SPI1_Type          SPI1;          // @0x40013000
-struct SPI1_Type          SPI2;          // @0x40003800
-struct SPI1_Type          SPI3;          // @0x40003C00
-struct STK_Type           STK;           // @0xE000E010
-struct SYSCFG_Type        SYSCFG;        // @0x40010000
-struct TAMP_Type          TAMP;          // @0x40002400
-struct TIM1_Type          TIM1;          // @0x40012C00 Also: TIM6_Type
-struct TIM15_Type         TIM15;         // @0x40014000 Also: TIM16_Type TIM6_Type
-struct TIM16_Type         TIM16;         // @0x40014400
-struct TIM16_Type         TIM17;         // @0x40014800
-struct TIM1_Type          TIM2;          // @0x40000000
-struct TIM1_Type          TIM3;          // @0x40000400
-struct TIM1_Type          TIM4;          // @0x40000800
-struct TIM6_Type          TIM6;          // @0x40001000
-struct TIM6_Type          TIM7;          // @0x40001400
-struct TIM1_Type          TIM8;          // @0x40013400
-struct USART_Type         UART4;         // @0x40004C00
-struct UCPD1_Type         UCPD1;         // @0x4000A000
-struct USART_Type         USART1;        // @0x40013800
-struct USART_Type         USART2;        // @0x40004400
-struct USART_Type         USART3;        // @0x40004800
-struct USB_FS_device_Type USB_FS_device; // @0x40005C00
-struct VREFBUF_Type       VREFBUF;       // @0x40010030
-struct WWDG_Type          WWDG;          // @0x40002C00
+extern struct ADC1_Type          ADC1;          // @0x50000000
+extern struct ADC12_Common_Type  ADC12_Common;  // @0x50000200
+extern struct ADC1_Type          ADC2;          // @0x50000100
+extern struct ADC12_Common_Type  ADC345_Common; // @0x50000700
+extern struct AES_Type           AES;           // @0x50060000
+extern struct COMP_Type          COMP;          // @0x40010200
+extern struct CORDIC_Type        CORDIC;        // @0x40020C00
+extern struct CRC_Type           CRC;           // @0x40023000
+extern struct CRS_Type           CRS;           // @0x40002000
+extern struct DAC1_Type          DAC1;          // @0x50000800
+extern struct DAC1_Type          DAC2;          // @0x50000C00
+extern struct DAC1_Type          DAC3;          // @0x50001000
+extern struct DAC1_Type          DAC4;          // @0x50001400
+extern struct DBGMCU_Type        DBGMCU;        // @0xE0042000
+extern struct DMA1_Type          DMA1;          // @0x40020000
+extern struct DMA1_Type          DMA2;          // @0x40020400
+extern struct DMAMUX_Type        DMAMUX;        // @0x40020800
+extern struct EXTI_Type          EXTI;          // @0x40010400
+extern struct FDCAN_Type         FDCAN;         // @0x4000A400
+extern struct FDCAN_Type         FDCAN1;        // @0x40006400
+extern struct FLASH_Type         FLASH;         // @0x40022000
+extern struct FMAC_Type          FMAC;          // @0x40021400
+extern struct FPU_Type           FPU;           // @0xE000EF34
+extern struct FPU_CPACR_Type     FPU_CPACR;     // @0xE000EF08
+extern struct GPIOA_Type         GPIOA;         // @0x48000000
+extern struct GPIOA_Type         GPIOB;         // @0x48000400
+extern struct GPIOA_Type         GPIOC;         // @0x48000800
+extern struct GPIOA_Type         GPIOD;         // @0x48000C00
+extern struct GPIOA_Type         GPIOE;         // @0x48001000
+extern struct GPIOA_Type         GPIOF;         // @0x48001400
+extern struct GPIOA_Type         GPIOG;         // @0x48001800
+extern struct I2C1_Type          I2C1;          // @0x40005400
+extern struct I2C1_Type          I2C2;          // @0x40005800
+extern struct I2C1_Type          I2C3;          // @0x40007800
+extern struct IWDG_Type          IWDG;          // @0x40003000
+extern struct LPTIMER1_Type      LPTIMER1;      // @0x40007C00
+extern struct LPUART1_Type       LPUART1;       // @0x40008000
+extern struct MPU_Type           MPU;           // @0xE000E084
+extern struct NVIC_Type          NVIC;          // @0xE000E100
+extern struct OPAMP_Type         OPAMP;         // @0x40010300
+extern struct PWR_Type           PWR;           // @0x40007000
+extern struct RCC_Type           RCC;           // @0x40021000
+extern struct RNG_Type           RNG;           // @0x50060800
+extern struct RTC_Type           RTC;           // @0x40002800
+extern struct SAI_Type           SAI;           // @0x40015400
+extern struct SCB_Type           SCB;           // @0xE000E040
+extern struct SCB_ACTRL_Type     SCB_ACTRL;     // @0xE000E008
+extern struct SPI1_Type          SPI1;          // @0x40013000
+extern struct SPI1_Type          SPI2;          // @0x40003800
+extern struct SPI1_Type          SPI3;          // @0x40003C00
+extern struct STK_Type           STK;           // @0xE000E010
+extern struct SYSCFG_Type        SYSCFG;        // @0x40010000
+extern struct TAMP_Type          TAMP;          // @0x40002400
+extern struct TIM1_Type          TIM1;          // @0x40012C00 Also: TIM6_Type
+extern struct TIM15_Type         TIM15;         // @0x40014000 Also: TIM16_Type TIM6_Type
+extern struct TIM16_Type         TIM16;         // @0x40014400
+extern struct TIM16_Type         TIM17;         // @0x40014800
+extern struct TIM1_Type          TIM2;          // @0x40000000
+extern struct TIM1_Type          TIM3;          // @0x40000400
+extern struct TIM1_Type          TIM4;          // @0x40000800
+extern struct TIM6_Type          TIM6;          // @0x40001000
+extern struct TIM6_Type          TIM7;          // @0x40001400
+extern struct TIM1_Type          TIM8;          // @0x40013400
+extern struct USART_Type         UART4;         // @0x40004C00
+extern struct UCPD1_Type         UCPD1;         // @0x4000A000
+extern struct USART_Type         USART1;        // @0x40013800
+extern struct USART_Type         USART2;        // @0x40004400
+extern struct USART_Type         USART3;        // @0x40004800
+extern struct USB_FS_device_Type USB_FS_device; // @0x40005C00
+extern struct VREFBUF_Type       VREFBUF;       // @0x40010030
+extern struct WWDG_Type          WWDG;          // @0x40002C00

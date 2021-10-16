@@ -108,9 +108,9 @@ inline struct {{$.TypeName .Name}}_Type* {{$dname}}_as_{{$.TypeName .Name}}_Type
 {{range .Peripherals}}
 {{- if .BaseAddress}}
 {{- if .DerivedFrom}}
-struct {{$.TypeName .DerivedFrom}}_Type 	{{.Name}};	// @{{.BaseAddress.Hex}}
+extern struct {{$.TypeName .DerivedFrom}}_Type 	{{.Name}};	// @{{.BaseAddress.Hex}}
 {{- else}}
-struct {{$.TypeName .Name}}_Type	{{.Name}};	// @{{.BaseAddress.Hex}} {{if .Extends}}Also:{{range .Extends}} {{$.TypeName .Name}}_Type{{end}}{{end}}
+extern struct {{$.TypeName .Name}}_Type	{{.Name}};	// @{{.BaseAddress.Hex}} {{if .Extends}}Also:{{range .Extends}} {{$.TypeName .Name}}_Type{{end}}{{end}}
 {{- end}}
 {{- end}}
 {{- end}}
