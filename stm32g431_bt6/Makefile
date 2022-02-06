@@ -4,7 +4,7 @@ CC          := $(PREFIX)gcc
 OBJCOPY     := $(PREFIX)objcopy
 SIZE        := $(PREFIX)size
 
-REVISION := $(shell git log -1 --format="%h")
+REVISION := $(shell git log -1 --format="%h" || echo "<NONE>")
 
 ARCH_FLAGS	 = -mthumb -mcpu=cortex-m4
 LTO_FLAGS	 = -O2 -flto -fuse-linker-plugin -ffunction-sections -fdata-sections -fverbose-asm -ffat-lto-objects
@@ -21,6 +21,8 @@ OBJS = \
 	boot.o \
 	clock.o \
 	gpio2.o \
+	printf.o \
+	usart.o \
 	main.o \
 
 $(OBJS): Makefile 

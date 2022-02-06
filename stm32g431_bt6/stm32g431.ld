@@ -1,7 +1,8 @@
 MEMORY
 {
   FLASHROM (rx)  : ORIGIN = 0x08000000, LENGTH = 64K
-  RAM      (rw)  : ORIGIN = 0x20000000, LENGTH = 22K
+  SRAM1    (rw)  : ORIGIN = 0x20000000, LENGTH = 16K
+  SRAM2    (rw)  : ORIGIN = 0x20004000, LENGTH = 6K
   CCRAM    (rw)  : ORIGIN = 0x10000000, LENGTH = 10K /* Aliased at 0x20005800 */
 }
 
@@ -9,7 +10,6 @@ INCLUDE devs.ld
 
 GPIO_ALL = GPIOA;
 UNIQUE_DEVICE_ID = 0x1FFF7590;  /* ref manual 4.1 */
-
 
 /* Highest address of the user mode stack */
 _estack = ORIGIN(CCRAM) + LENGTH(CCRAM);    /* end of CCRAM */
@@ -104,7 +104,7 @@ SECTIONS
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
-  } >RAM AT> FLASHROM
+  } >SRAM1 AT> FLASHROM
 
   /* Uninitialized data section */
   . = ALIGN(4);
@@ -120,7 +120,7 @@ SECTIONS
     . = ALIGN(4);
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
-  } >RAM
+  } >SRAM1
 
   /* Remove information from the standard libraries */
   /DISCARD/ :

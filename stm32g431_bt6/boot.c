@@ -1,5 +1,5 @@
 #include "cortex_m4.h"
-#include "stm32g431.h"
+#include "stm32g4xx.h"
 
 extern void main(void);                            // in main.c
 extern void (*vector_table[])(void);               // in vector.c
@@ -84,6 +84,7 @@ static int setSysClockTo144MHz(void) {
 	return 1;
 }
 #endif
+
 void Reset_Handler(void) {
 	char* src = &_sidata;
 	char* dst = &_sdata;
@@ -102,8 +103,8 @@ void Reset_Handler(void) {
 	 	__NOP();
 
 	stk_load_set_reload(&STK, STK_LOAD_RELOAD);
-	stk_val_set_current(&STK, 0);
-	STK.CTRL |= /*STK_CTRL_CLKSOURCE |*/ STK_CTRL_TICKINT | STK_CTRL_ENABLE;
+	stk_val_set_current(&STK, STK_LOAD_RELOAD);
+	STK.CTRL |= STK_CTRL_CLKSOURCE | STK_CTRL_TICKINT | STK_CTRL_ENABLE;
 
 	main();
 

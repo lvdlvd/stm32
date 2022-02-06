@@ -42575,9 +42575,20 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
             <value>89</value>
          </interrupt>
       </peripheral>
-	  <peripheral derivedFrom="FDCAN1">
+	  <peripheral>
          <name>FDCANs_Message_RAM</name>
-         <baseAddress>0x4000A400</baseAddress>                      
+         <baseAddress>0x4000A400</baseAddress> 
+            <registers>
+               <register>
+                  <name>DUM</name>
+                  <displayName>DUM</displayName>
+                  <description>Dummy definition</description>
+                  <addressOffset>0x0</addressOffset>
+                  <size>0x20</size>
+                  <access>read-write</access>
+                  <resetValue>0x00000000</resetValue>
+               </register>
+            </registers>
       </peripheral>
       <peripheral>
          <name>UCPD1</name>

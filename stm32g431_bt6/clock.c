@@ -1,13 +1,10 @@
 #include "cortex_m4.h"
-#include "stm32g431.h"
+#include "stm32g4xx.h"
 
 #include "clock.h"
 
-// with SysTick_Config((1U << 24) - 1), tick at 4.2915 HZ,
-// but everything also works for different configs.
-
 // clocktics starts at 1 tick ahead.  TODO set when enabling the systick interval
-static volatile uint64_t clockticks = (1U << 24); // rolls over after 2^64/72MHz = 8118.81294 years
+static volatile uint64_t clockticks = (1U << 24);
 
 // this irq has a higher priority than all userspace, so we consider update to be atomic
 // clockticks holds the counts at the _end_ of the next systick,
