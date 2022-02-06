@@ -17,9 +17,9 @@ Copyright (c) 2022 STMicroelectronics.
  limitations under the License.
 -->
 <device xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.1" xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
-   <name>STM32G431xx</name>
+   <name>STM32G441xx</name>
    <version>1.9</version>
-   <description>STM32G431xx</description>
+   <description>STM32G441xx</description>
     <cpu>
     <name>CM4</name>
     <revision>r0p1</revision>
@@ -1333,7 +1333,7 @@ Copyright (c) 2022 STMicroelectronics.
                      <access>read-only</access>
                   </field>
 				  <field>
-                     <name>BK_ECC</name> 
+                     <name>BK_ECC</name>  
                      <description>BK_ECC</description>
                      <bitOffset>21</bitOffset>
                      <bitWidth>1</bitWidth>
@@ -11455,6 +11455,9 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
             </register>
          </registers>
       </peripheral>
+	  
+	  
+	  
       <peripheral>
          <name>GPIOA</name>
          <description>General-purpose I/Os</description>
@@ -29490,7 +29493,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
             </register>
         </registers>	
     </peripheral>											
-   <peripheral>
+	<peripheral>
          <name>COMP</name>
          <description>Comparator control and status register</description>
          <groupName>COMP</groupName>
@@ -29837,7 +29840,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                </fields>
             </register>				          		
         </registers>	
-    </peripheral>		         
+    </peripheral>	         
     <peripheral>
          <name>OPAMP</name>
          <description>Operational amplifiers</description>
@@ -34949,7 +34952,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
             </register>
          </registers>
       </peripheral>
-     <peripheral>
+    <peripheral>
          <name>MPU</name>
          <description>Memory protection unit</description>
          <groupName>MPU</groupName>
@@ -35864,7 +35867,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
             </register>
          </registers>
       </peripheral>      
-      <peripheral>
+       <peripheral>
          <name>NVIC</name>
          <description>Nested Vectored Interrupt       Controller</description>
          <groupName>NVIC</groupName>
@@ -38533,7 +38536,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
             </register>
          </registers>
       </peripheral>
-      <peripheral derivedFrom="FDCAN">
+       <peripheral derivedFrom="FDCAN">
          <name>FDCAN1</name>
          <baseAddress>0x40006400</baseAddress>
          <interrupt>
