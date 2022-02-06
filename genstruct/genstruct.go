@@ -277,7 +277,13 @@ func main() {
 		device.Interrupts = append(device.Interrupts, v.Interrupts...)
 
 		sort.Sort(byAddressOffset(v.Registers))
+
+		devpfx := v.Name + "_"
+
 		for _, w := range v.Registers {
+
+			w.Name = strings.TrimPrefix(w.Name, devpfx)
+
 			cleanws(&w.Description)
 
 			if len(w.Fields) == 0 {

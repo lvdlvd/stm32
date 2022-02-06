@@ -46,8 +46,8 @@ void DMA1_CH6_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void ADC1_2_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void USB_HP_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void USB_LP_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
-void fdcan1_intr1_it_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
-void fdcan1_intr0_it_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
+void FDCAN1_IT0_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
+void FDCAN1_IT1_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void EXTI9_5_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void TIM1_BRK_TIM15_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void TIM1_UP_TIM16_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
@@ -84,7 +84,8 @@ void DMA2_CH4_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void DMA2_CH5_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void UCPD1_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void COMP1_2_3_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
-void COMP4_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
+void COMP4_5_6_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
+void COMP7_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void CRS_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void SAI_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void FPU_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
@@ -120,7 +121,7 @@ __attribute__((section(".isr_vector"))) void (*vector_table[])(void) = {
     [16 + RTC_TAMP_CSS_LSE_IRQn] = RTC_TAMP_CSS_LSE_Handler, // 2 RTC_TAMP_CSS_LSE
     [16 + RTC_WKUP_IRQn]         = RTC_WKUP_Handler,         // 3 RTC Wakeup timer
     [16 + FLASH_IRQn]            = FLASH_Handler,            // 4 FLASH
-    [16 + RCC_IRQn]              = RCC_Handler,              // 5 RCC
+    [16 + RCC_IRQn]              = RCC_Handler,              // 5 RCC global interrupt
     [16 + EXTI0_IRQn]            = EXTI0_Handler,            // 6 EXTI Line0 interrupt
     [16 + EXTI1_IRQn]            = EXTI1_Handler,            // 7 EXTI Line1 interrupt
     [16 + EXTI2_IRQn]            = EXTI2_Handler,            // 8 EXTI Line2 interrupt
@@ -135,8 +136,8 @@ __attribute__((section(".isr_vector"))) void (*vector_table[])(void) = {
     [16 + ADC1_2_IRQn]           = ADC1_2_Handler,           // 18 ADC1 and ADC2 global interrupt
     [16 + USB_HP_IRQn]           = USB_HP_Handler,           // 19 USB_HP
     [16 + USB_LP_IRQn]           = USB_LP_Handler,           // 20 USB_LP
-    [16 + fdcan1_intr1_it_IRQn]  = fdcan1_intr1_it_Handler,  // 21 fdcan1_intr1_it
-    [16 + fdcan1_intr0_it_IRQn]  = fdcan1_intr0_it_Handler,  // 22 fdcan1_intr0_it
+    [16 + FDCAN1_IT0_IRQn]       = FDCAN1_IT0_Handler,       // 21 FDCAN1 interrupt 0
+    [16 + FDCAN1_IT1_IRQn]       = FDCAN1_IT1_Handler,       // 22 FDCAN1 interrupt 1
     [16 + EXTI9_5_IRQn]          = EXTI9_5_Handler,          // 23 EXTI9_5
     [16 + TIM1_BRK_TIM15_IRQn]   = TIM1_BRK_TIM15_Handler,   // 24 TIM1_BRK_TIM15
     [16 + TIM1_UP_TIM16_IRQn]    = TIM1_UP_TIM16_Handler,    // 25 TIM1_UP_TIM16
@@ -173,7 +174,8 @@ __attribute__((section(".isr_vector"))) void (*vector_table[])(void) = {
     [16 + DMA2_CH5_IRQn]         = DMA2_CH5_Handler,         // 60 DMA2_CH5
     [16 + UCPD1_IRQn]            = UCPD1_Handler,            // 63 UCPD1
     [16 + COMP1_2_3_IRQn]        = COMP1_2_3_Handler,        // 64 COMP1_2_3
-    [16 + COMP4_IRQn]            = COMP4_Handler,            // 65 COMP4_5_6
+    [16 + COMP4_5_6_IRQn]        = COMP4_5_6_Handler,        // 65 COMP4_5_6
+    [16 + COMP7_IRQn]            = COMP7_Handler,            // 66 COMP7
     [16 + CRS_IRQn]              = CRS_Handler,              // 75 CRS
     [16 + SAI_IRQn]              = SAI_Handler,              // 76 SAI
     [16 + FPU_IRQn]              = FPU_Handler,              // 81 Floating point unit interrupt
