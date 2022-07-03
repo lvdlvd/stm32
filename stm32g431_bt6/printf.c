@@ -7,8 +7,8 @@ inline uint16_t ringbuffer_free(const struct Ringbuffer *rb);
 inline int      ringbuffer_empty(const struct Ringbuffer *rb);
 inline int      ringbuffer_full(const struct Ringbuffer *rb);
 inline void     ringbuffer_clear(struct Ringbuffer *rb);
-inline void     put_head(struct Ringbuffer *rb, uint8_t c);
-inline uint8_t  get_tail(struct Ringbuffer *rb);
+inline void     ringbuffer_put_head(struct Ringbuffer *rb, uint8_t c);
+inline uint8_t  ringbuffer_get_tail(struct Ringbuffer *rb);
 
 size_t ringbuffer_puts(struct Ringbuffer *rb, const char *buf, size_t len) {
     const size_t l = ringbuffer_free(rb);
@@ -16,7 +16,7 @@ size_t ringbuffer_puts(struct Ringbuffer *rb, const char *buf, size_t len) {
         len = l;
     }
     for (size_t i = 0; i < len; ++i) {
-        put_head(rb, buf[i]);
+        ringbuffer_put_head(rb, buf[i]);
     }
     return len;
 }

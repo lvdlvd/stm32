@@ -11325,7 +11325,7 @@ enum {
 	SCB_CCR_STKALIGN = 1UL<<9, // STKALIGN
 	SCB_CCR_BFHFNMIGN = 1UL<<8, // BFHFNMIGN
 	SCB_CCR_DIV_0_TRP = 1UL<<4, // DIV_0_TRP
-	SCB_CCR_UNALIGN__TRP = 1UL<<3, // UNALIGN_ TRP
+	SCB_CCR_UNALIGN_TRP = 1UL<<3, // UNALIGN_ TRP
 	SCB_CCR_USERSETMPEND = 1UL<<1, // USERSETMPEND
 	SCB_CCR_NONBASETHRDENA = 1UL<<0, // Configures how the processor enters Thread mode		
 };
@@ -11397,7 +11397,8 @@ enum {
 	SCB_CFSR_UFSR_BFSR_MMFSR_MLSPERR = 1UL<<5, // MLSPERR
 	SCB_CFSR_UFSR_BFSR_MMFSR_MSTKERR = 1UL<<4, // Memory manager fault on stacking for exception entry.
 	SCB_CFSR_UFSR_BFSR_MMFSR_MUNSTKERR = 1UL<<3, // Memory manager fault on unstacking for a return from exception
-	SCB_CFSR_UFSR_BFSR_MMFSR_IACCVIOL = 1UL<<1, // Instruction access violation flag		
+	SCB_CFSR_UFSR_BFSR_MMFSR_DACCVIOL = 1UL<<1, // Data access violation flag		
+	SCB_CFSR_UFSR_BFSR_MMFSR_IACCVIOL = 1UL<<0, // Instruction access violation flag		
 };
 
 // SCB->HFSR Hard fault status register
@@ -13173,7 +13174,7 @@ inline void ucpd1_rx_ordext2_set_rxsopx2(struct UCPD1_Type* p, uint32_t val) { p
 inline uint32_t ucpd1_rx_ordext2_get_rxsopx2(struct UCPD1_Type* p) { return (p->RX_ORDEXT2 & UCPD1_RX_ORDEXT2_RXSOPX2) >> 0 ; }
 
 
-
+#if 0 // we're using stm32f103usb.h instead
 
 /* USB_FS_device */
 struct USB_FS_device_Type {
@@ -13442,6 +13443,8 @@ enum {
 inline void usb_fs_device_btable_set_btable(struct USB_FS_device_Type* p, uint32_t val) { p->BTABLE = (p->BTABLE & ~USB_FS_DEVICE_BTABLE_BTABLE) | ((val<<3) & USB_FS_DEVICE_BTABLE_BTABLE); }
 inline uint32_t usb_fs_device_btable_get_btable(struct USB_FS_device_Type* p) { return (p->BTABLE & USB_FS_DEVICE_BTABLE_BTABLE) >> 3 ; }
 
+#endif // skip the USB part
+
 /* Voltage reference buffer */
 struct VREFBUF_Type {
 	__IO uint8_t CSR; // @0 VREF_BUF Control and Status Register
@@ -13594,7 +13597,7 @@ extern struct UCPD1_Type	UCPD1;	// @0x4000A000
 extern struct USART_Type 	USART1;	// @0x40013800
 extern struct USART_Type 	USART2;	// @0x40004400
 extern struct USART_Type 	USART3;	// @0x40004800
-extern struct USB_FS_device_Type	USB_FS_device;	// @0x40005C00 
+// extern struct USB_FS_device_Type	USB_FS_device;	// @0x40005C00 
 extern struct VREFBUF_Type	VREFBUF;	// @0x40010030 
 extern struct WWDG_Type	WWDG;	// @0x40002C00 
 
