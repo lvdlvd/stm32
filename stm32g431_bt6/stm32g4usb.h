@@ -26,7 +26,7 @@
 #include <stdint.h>
 
 // Universal serial bus full-speed device interface
-// Sec 23.5: The peripheral registers can be accessed by half-words (16-bit) or words (32-bit).
+// Sec 45.6: The peripheral registers can be accessed by half-words (16-bit) or words (32-bit).
 extern struct USB_Type {
 		volatile uint32_t EPR[8];
 		const uint8_t RESERVED[32];
@@ -113,6 +113,9 @@ enum {
 	USB_CNTR_RESETM 	= 1UL<<10, // USB reset interrupt mask
 	USB_CNTR_SOFM 		= 1UL<<9, // Start of frame interrupt mask
 	USB_CNTR_ESOFM 		= 1UL<<8, // Expected start of frame interrupt mask
+	USB_CNTR_L1REQM 	= 1UL<<7, // LPM L1 state request mask
+	// bit 6 reserved
+	USB_CNTR_L1RESUME 	= 1UL<<5, // LPM L1 Resume request
 	USB_CNTR_RESUME 	= 1UL<<4, // Resume request
 	USB_CNTR_FSUSP 		= 1UL<<3, // Force suspend
 	USB_CNTR_LPMODE 	= 1UL<<2, // Low-power mode
@@ -130,7 +133,10 @@ enum {
 	USB_ISTR_RESET 	= 1UL<<10, // reset request
 	USB_ISTR_SOF 	= 1UL<<9,  // start of frame
 	USB_ISTR_ESOF 	= 1UL<<8,  // Expected start frame
-	USB_ISTR_DIR 	= 1UL<<4,  // Direction of transaction
+	USB_ISTR_L1REQ 	= 1UL<<7,  // LPM L1 state request
+// DIR bit=0, CTR_TX bit is set in the USB_EPnR register related to the interrupting endpoint. The interrupting transaction is of IN type (data transmitted by the USB peripheral to the host PC).
+// DIR bit=1, CTR_RX bit or both CTR_TX/CTR_RX are set in the USB_EPnR register related to the interrupting endpoint. The interrupting transaction is of OUT type (data received by the USB peripheral from the host PC) or two pending transactions are waiting to be processed.
+	USB_ISTR_DIR 	= 1UL<<4,  // Direction of transaction 
 	USB_ISTR_EP_ID 	= ((1UL<<4)-1) << 0, // Endpoint Identifier		
 };
 
@@ -159,7 +165,8 @@ enum {
 	USB_BCDR_DPPU = 1UL<<15, // enable DP Pullup.
 };
 
-
+// 45.6.2 Buffer descriptor table
+//  The packet memory should be accessed only by byte (8-bit) or half-word (16-bit) accesses. Word (32-bit) accesses are not allowed.
 extern union {
     struct {
         volatile uint32_t ADDR_TX;  // in units of uint16, always even
@@ -167,7 +174,7 @@ extern union {
         volatile uint32_t ADDR_RX;
         volatile uint32_t COUNT_RX;
     } btable[8];  // located here by virtue of USB.BTABLE being zero
-    uint16_t buf[512]; // interspersed, 2 bytes data, 2 bytes reserved, only accessible as uint16 or uint32
+    uint16_t buf[512]; // interspersed, even index: 2 bytes data, odd index: 2 bytes reserved, only accessible as uint16 or uint8
 } USB_PMA; // @ 0x50006000
 
 enum {

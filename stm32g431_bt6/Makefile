@@ -19,10 +19,12 @@ LDFLAGS		 = -nostartfiles -lnosys -static $(ARCH_FLAGS) $(LTO_FLAGS) $(WARN_FLAG
 OBJS = \
 	vectors.o \
 	boot.o \
+	fault.o \
 	clock.o \
 	gpio2.o \
 	printf.o \
 	usart.o \
+	usb.o \
 	main.o \
 
 $(OBJS): Makefile 
@@ -39,7 +41,7 @@ $(OBJS): Makefile
 	$(OBJCOPY) -O ihex --set-start 0x08000000 $< $@
 
 flash: main.hex
-	st-flash --reset --format ihex write $<
+	st-flash --connect-under-reset --reset --format ihex write $<
 
 debug: main.elf
 	st-util &
@@ -51,3 +53,14 @@ clean:
 
 depend:
 	makedepend -Y. -w150 *.c
+# DO NOT DELETE
+
+boot.o: cortex_m4.h stm32g4xx.h
+clock.o: cortex_m4.h stm32g4xx.h clock.h
+fault.o: cortex_m4.h stm32g4xx.h
+gpio2.o: gpio2.h stm32g4xx.h
+main.o: cortex_m4.h stm32g4xx.h clock.h gpio2.h nvic.h printf.h usart.h usb.h
+printf.o: printf.h stb_sprintf.h
+usart.o: usart.h stm32g4xx.h printf.h
+usb.o: usb.h stm32g4usb.h
+vectors.o: cortex_m4.h stm32g4xx.h

@@ -2,15 +2,16 @@
 #include "stm32g4xx.h"
 
 extern void _estack(void); // fake definition, will be filled in by linker script.
- void default_IRQ_Handler(void) {
-    for(;;)
-        __NOP();
- }
+extern void unhandled_interrupt(uint32_t irq);  // in fault.c
+
+void default_IRQ_Handler(void) { 
+    unhandled_interrupt(__get_IPSR()); 
+}
 
 // Core fault handlers
 void Reset_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void NonMaskableInt_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
-void Reserved_3_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
+void HardFault_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void MemoryManagement_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void BusFault_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void UsageFault_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
@@ -132,7 +133,7 @@ __attribute__((section(".isr_vector"))) void (*vector_table[])(void) = {
     _estack,
     Reset_Handler,
     NonMaskableInt_Handler,
-    Reserved_3_Handler,
+    HardFault_Handler,
     MemoryManagement_Handler,
     BusFault_Handler,
     UsageFault_Handler,

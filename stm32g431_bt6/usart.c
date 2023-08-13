@@ -6,7 +6,7 @@ void usart_init(struct USART_Type* usart, int baud) {
 	usart->CR2 = 0;
 	usart->CR3 = 0;
 
-    uint32_t clk = 36000000;
+    uint32_t clk = 144000000;
  
 	usart->BRR = clk / baud;
 	usart->CR1 |= USART_CR1_UE | USART_CR1_TE;

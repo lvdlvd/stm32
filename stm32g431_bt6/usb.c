@@ -6,11 +6,12 @@
 #include "usb.h"
 #include "stm32g4usb.h"
 
-#include "tprintf.h"
+#include "printf.h"
+extern size_t u2puts(const char* buf, size_t len);
 
 
-static enum usb_state_t _usb_state       = USB_UNATTACHED;
-//static enum usb_state_t _usb_state_saved = USB_UNATTACHED; // when state is suspended, the state to return to on wakeup
+static enum usb_state_t _usb_state = USB_UNATTACHED;
+static enum usb_state_t _usb_state_saved = USB_UNATTACHED; // when state is suspended, the state to return to on wakeup
 
 enum usb_state_t usb_state() { return _usb_state; }
 
@@ -30,11 +31,11 @@ void usb_init() {
     _usb_state = USB_UNATTACHED;
 
     USB.CNTR   = USB_CNTR_FRES; // hold in reset, clear power down
-    USB.ISTR   = 0;
-    USB.DADDR  = 0;
-    USB.BTABLE = 0;
-    USB.LPMCSR = 0;
-    USB.BCDR   = 0;
+    USB.ISTR   = 0; // clear pending interrupts
+    USB.DADDR  = 0; // Device address is zero 
+    USB.BTABLE = 0; // btable at start of packet mem
+    USB.LPMCSR = 0; // no low-power support
+    USB.BCDR   = 0; // no battery charging detector support
 
     for (int i = 0; i < 8; ++i) {
         usb_ep_reset(i);
@@ -51,16 +52,18 @@ void usb_init() {
     usb_ep_set_rx_size(1, 64);
 
     // bring out of reset and enable interrupts
-    USB.CNTR = USB_CNTR_CTRM | USB_CNTR_RESETM | USB_CNTR_ERRM | USB_CNTR_PMAOVRM;
-    // USB.CNTR |=  USB_CNTR_WKUPM | USB_CNTR_SUSPM; // if we want to handle SUSP/WKUP
-    USB.BCDR = USB_BCDR_DPPU;
+    USB.CNTR = USB_CNTR_CTRM | USB_CNTR_RESETM | USB_CNTR_WKUPM | USB_CNTR_SUSPM;
+
+    USB.BCDR |= USB_BCDR_DPPU; // connect DP pullup 
 }
 
 void usb_shutdown() {
+
     USB.CNTR = USB_CNTR_FRES;
     USB.ISTR = 0;
-    USB.CNTR |= USB_CNTR_PDWN | USB_CNTR_LPMODE;
-    USB.BCDR &= ~USB_BCDR_DPPU;
+    USB.BCDR = 0; // disconnect
+    USB.CNTR = USB_CNTR_FRES | USB_CNTR_PDWN;
+   
     _usb_state = USB_UNATTACHED;
 }
 
@@ -111,80 +114,16 @@ static void handle_ep0(void); // below
 
 size_t usb_recv(uint8_t* buf, size_t sz) {
 
-    uint16_t istr = USB.ISTR;
+    while ((USB.ISTR & USB_ISTR_CTR) != 0) {
 
-    USB.ISTR = ~(USB_ISTR_SOF | USB_ISTR_ESOF | USB_ISTR_WKUP | USB_ISTR_SUSP);
-
-    if (istr & USB_ISTR_ERR) {
-        USB.ISTR = ~USB_ISTR_ERR;
-    }
-
-    if (istr & USB_ISTR_PMAOVR) {
-        USB.ISTR = ~USB_ISTR_PMAOVR;
-    }
-
-
-    if (istr & USB_ISTR_RESET) {
-
-        USB.ISTR = ~USB_ISTR_RESET;
-        USB.CNTR &= ~(USB_CNTR_RESUME | USB_CNTR_FSUSP | USB_CNTR_LPMODE | USB_CNTR_PDWN | USB_CNTR_FRES);
-
-        usb_ep_config(0, USB_EP_TYPE_CONTROL, 0);
-        usb_ep_set_stat_tx(0, USB_EP_STAT_NAK); 
-        usb_ep_set_stat_rx(0, USB_EP_STAT_NAK); // only setup will succeed 
-
-        for (int i = 1; i < 8; ++i) {
-            usb_ep_reset(i);
-        }
-
-        usb_daddr_set_add(0);
-        USB.DADDR |= USB_DADDR_EF;
-
-        _usb_state = USB_DEFAULT;
-        return 0;
-    }
-
-#if 0
-	// USB2.0 sec 9.1.1.6: When suspended, the USB device maintains any internal 
-	// status, including its address and configuration.
-	// The device must draw less than 2.5mA from the bus in this configuration.
-	// TODO: facility to sleep/wkup the entire system?
-
-	if (istr & USB_ISTR_WKUP) {
-        USB.ISTR = ~USB_ISTR_WKUP;
-		USB.CNTR &= ~USB_CNTR_FSUSP;
-
-		// According to RMA008 23.4.5, table 172, / RMA0440 Rev7, 45.5.5 table 416 
-        // the RXDP line must be checked for spurious wakeups through noise on the bus.
-		if ((USB.FNR & USB_FNR_RXDP) != 0) {
-			// spurious?
-		}
-        if ((USB.FNR & USB_FNR_RXDM) != 0) {
-            // root reset
-        } else {
-            // root resume
-        }
-
-		_usb_state = _usb_state_saved; 
-		return 0;
-	}
-
-	if (istr & USB_ISTR_SUSP) {
-        USB.ISTR = ~USB_ISTR_SUSP;
-		USB.CNTR |= USB_CNTR_FSUSP;
-
-		_usb_state_saved = _usb_state;
-		_usb_state = USB_SUSPENDED;
-		return 0;
-	}
-#endif
-
-    if (istr & USB_ISTR_CTR) {
         uint8_t ep = usb_istr_get_ep_id();
+
+        cbprintf(u2puts, " ctr %d\n", ep);
+
         if (ep == 0) {
             handle_ep0();
-            return 0;
-        }
+            continue;
+        }   
 
         // assert (ep == 1)
         if (USB.EPR[ep] & USB_EPRx_CTR_TX) {
@@ -192,7 +131,7 @@ size_t usb_recv(uint8_t* buf, size_t sz) {
             // assert(usb_ep_get_stat_tx() == USB_EP_STAT_NAK)
             // hardware will have toggled DTOG
             usb_ep_clr_ctr_tx(ep);
-        }
+        } 
 
         if (USB.EPR[ep] & USB_EPRx_CTR_RX) {
             // OUT transaction
@@ -203,7 +142,83 @@ size_t usb_recv(uint8_t* buf, size_t sz) {
             usb_ep_set_stat_rx(ep, USB_EP_STAT_VALID);
             return len;
         }
+
     }
+
+    // the other ISTR bits are r or rc_w0, meaning to clear them write ~bit to the register, avoid read-mod-write.
+
+    if (USB.ISTR & USB_ISTR_RESET) {
+
+        USB.ISTR = ~USB_ISTR_RESET;
+
+        cbprintf(u2puts, " reset");
+
+        USB.CNTR &= ~(USB_CNTR_RESUME | USB_CNTR_FSUSP | USB_CNTR_LPMODE | USB_CNTR_PDWN | USB_CNTR_FRES);
+
+        usb_ep_config(0, USB_EP_TYPE_CONTROL, 0);
+        usb_ep_set_stat_tx(0, USB_EP_STAT_NAK); // only setup will succeed  
+        usb_ep_set_stat_rx(0, USB_EP_STAT_VALID);
+
+        for (int i = 1; i < 8; ++i) {
+            usb_ep_reset(i);
+        }
+
+        usb_daddr_set_add(0);
+        USB.DADDR |= USB_DADDR_EF;
+
+        _usb_state = USB_DEFAULT;
+
+    }
+
+    if (USB.ISTR & USB_ISTR_PMAOVR) {
+        USB.ISTR = ~USB_ISTR_PMAOVR;
+        cbprintf(u2puts, " pmaovr");
+    }
+
+    if (USB.ISTR & USB_ISTR_ERR) {
+        USB.ISTR = ~USB_ISTR_ERR;
+        cbprintf(u2puts, " err");
+    }
+
+    // USB2.0 sec 9.1.1.6: When suspended, the USB device maintains any internal 
+    // status, including its address and configuration.
+    // The device must draw less than 2.5mA from the bus in this configuration.
+    // TODO: facility to sleep/wkup the entire G4xx?
+
+    if (USB.ISTR & USB_ISTR_WKUP) {
+        USB.CNTR &= ~USB_CNTR_LPMODE;
+        USB.CNTR &= ~USB_CNTR_FSUSP;
+
+        cbprintf(u2puts, " wkup");
+
+        // // According to RM0440 Rev 7 45.5.5, table 416, the RXDP line
+        // // must be checked for spurious wakeups through noise on the bus.
+        // if ((USB.FNR & (USB_FNR_RXDP|USB_FNR_RXDM)) != USB_FNR_RXDM) {
+        //     cbprintf(u2puts, "spurious  fnr %u lsof %u D%s%s%s\n",  usb_fnr_get_fn(), usb_fnr_get_lsof(), 
+        // ((USB.FNR&USB_FNR_RXDP) ? "P" : "_"), 
+        // ((USB.FNR&USB_FNR_RXDM) ? "M":"_"), 
+        // ((USB.FNR&USB_FNR_LCK)  ? " LCK" : ""));
+        // }
+
+        USB.ISTR = ~USB_ISTR_WKUP;
+
+        _usb_state = _usb_state_saved; 
+    }
+
+    if (USB.ISTR & USB_ISTR_SUSP) {
+        USB.CNTR |= USB_CNTR_FSUSP;
+        USB.ISTR = ~USB_ISTR_SUSP;
+
+        _usb_state_saved = _usb_state;
+        _usb_state = USB_SUSPENDED;
+
+        USB.CNTR |= USB_CNTR_LPMODE;  // should be done /after FSUSP (todo simultaneous?)
+
+        cbprintf(u2puts, " susp");
+    }
+
+
+    USB.ISTR = ~(USB_ISTR_L1REQ | USB_ISTR_SOF | USB_ISTR_ESOF);
 
     return 0;
 }
@@ -223,8 +238,7 @@ size_t usb_send(const uint8_t* buf, size_t len) {
 
 // Setup and standard request handling
 
-#if 1
-static uint8_t _deviceDescriptor[] = {
+static const uint8_t _deviceDescriptor[] = {
     18,            // length of this descriptor
     0x01,          // DEVICE Descriptor Type
     0x00, 0x02,    // USB version 2.00
@@ -238,7 +252,7 @@ static uint8_t _deviceDescriptor[] = {
     1,             // NumConfigurations
 };
 
-static uint8_t _configDescriptor[] = {
+static const uint8_t _configDescriptor[] = {
     // Config 0 header
     9,                                //  Length
     0x02,                             //  CONFIGURATION Descriptor Type
@@ -275,88 +289,6 @@ static uint8_t _configDescriptor[] = {
     64, 0, //  MaxPacketSize
     0,     //  Interval, ignored for BULK
 };
-#else
-static uint8_t _deviceDescriptor[] = {
-    18,            // length of this descriptor
-    0x01,          // DEVICE Descriptor Type
-    0x00, 0x02,    // USB version 2.00
-    2,             // Device Class = CDC
-    0,    0,       // subclass, protocol 0,0
-    64,            //  Max Packet Size ep0
-    0x83, 0x04,    // VendorID  = 0x0483 (STMicroelectronics)
-    0x40, 0x57,    // ProductID = 0x5740 (Virtual COM Port)
-    0x00, 0x02,    // Device Version 2.0
-    0,    0,    0, // Manufacturer/Product/SerialNumber strings not set
-    1,             // NumConfigurations
-};
-
-static uint8_t _configDescriptor[] = {
-    // Config 0 header
-    9,                                //  Length
-    0x02,                             //  CONFIGURATION Descriptor Type
-    9 + 9 + 5 + 4 + 5 + 9 + 7 + 7, 0, //  TotalLength
-    2,                                //  NumInterfaces
-    1,                                //  ConfigurationValue
-    0,                                //  Configuration string not set
-    0x80,                             //  Attributes 0x80 for historical reasons
-    50,                               //  MaxPower 100mA
-
-    // interface 0
-    9,    // Length
-    0x04, // INTERFACE Descriptor Type
-    0, 0, // Interface Number, Alternate Setting
-    0,    // Num Endpoints
-    0x02, // InterfaceClass:    CDC
-    0x02, // InterfaceSubClass: ACM
-    0,    // InterfaceProtocol: NONE
-    0,    // Interface string not set
-
-    // CDC Header Functional Descriptor, CDC Spec 5.2.3.1, Table 26
-    5,          // bFunctionLength
-    0x24,       // bDescriptorType    CS_INTERFACE
-    0x00,       // bDescriptorSubtype USB_CDC_TYPE_HEADER
-    0x10, 0x01, // bcdCDC version 1.10
-
-    // Abstract Control Management Functional Descriptor, CDC Spec 5.2.3.3, Table 28
-    4,    // bFunctionLength
-    0x24, // bDescriptorType  CS_INTERFACE
-    0x02, // bDescriptorSubtype USB_CDC_TYPE_ACM
-    0x00, // bmCapabilities: none
-
-    // Union Functional Descriptor, CDC Spec 5.2.3.8, Table 33
-    5,    // bFunctionLength
-    0x24, // bDescriptorType  CS_INTERFACE
-    0x06, // bDescriptorSubtype USB_CDC_TYPE_UNION
-    0,    // bMasterInterface
-    1,    // bSlaveInterface0
-
-    // interface 1
-    9,    // Length
-    0x04, // INTERFACE Descriptor Type
-    1, 0, // Interface Number, Alternate Setting
-    2,    // Num Endpoints
-    0x0A, // InterfaceClass: USB_CLASS_DATA
-    0,    // InterfaceSubClass
-    0,    // InterfaceProtocol
-    0,    // Interface string not set
-
-    // endpoint 0x1
-    7,     //  Length
-    0x05,  //  ENDPOINT Descriptor Type
-    0x01,  //  Endpoint Address: 1-OUT
-    0x02,  //  Attributes: BULK
-    64, 0, //  MaxPacketSize
-    0,     //  Interval, ignored for BULK
-
-    // endpoint 0x81
-    7,     //  Length
-    0x05,  //  ENDPOINT Descriptor Type
-    0x81,  //  Endpoint Address 1-IN
-    0x02,  //  Attributes: BULK
-    64, 0, //  MaxPacketSize
-    0,     //  Interval, ignored for BULK
-};
-#endif
 
 enum {
     REQ_TYPE_TX = 1 << 7, // bit 7 direction: 1: device->host
@@ -559,9 +491,12 @@ static void handle_ep0(void) {
 
         // assert(usb_ep_get_stat_tx() == USB_EP_STAT_NAK)
         // assert(usb_ep_get_stat_rx() == USB_EP_STAT_NAK)
+        // assert dir == 1
 
-        if (usb_ep_get_rx_count(0) != 8)
+        if (usb_ep_get_rx_count(0) != 8) {
+              cbprintf(u2puts, " invalid setup packet %d\n", usb_ep_get_rx_count(0));
             break;
+        }
 
         const uint16_t* src = usb_ep_rx_buf(0);
         _ctrl_req.req       = src[0];
@@ -570,7 +505,7 @@ static void handle_ep0(void) {
         _ctrl_req.len       = src[6];
 
         usb_ep_clr_ctr_rx(0);
-
+        
         // if non-zero length request and direction is OUT
         // there's no request we can handle so bail out straightaway
         if ((_ctrl_req.len > 0) && !(_ctrl_req.req & REQ_TYPE_TX))
@@ -582,7 +517,7 @@ static void handle_ep0(void) {
             usb_ep_set_tx_count(0, 0); // ZLP status-in reply
         } else {
             if (!handle_get_request()) // sets up reply buffer
-                break;
+               break;
         }
 
         usb_ep_set_stat_tx(0, USB_EP_STAT_VALID);
