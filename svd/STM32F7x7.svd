@@ -1322,8 +1322,8 @@
                </fields>
             </register>
             <register>
-               <name>HASH_HR0</name>
-               <displayName>HASH_HR0</displayName>
+               <name>HHR0</name>
+               <displayName>HHR0</displayName>
                <description>HASH digest register</description>
                <addressOffset>0x310</addressOffset>
                <size>0x20</size>
@@ -1339,8 +1339,8 @@
                </fields>
             </register>
             <register>
-               <name>HASH_HR1</name>
-               <displayName>HASH_HR1</displayName>
+               <name>HHR1</name>
+               <displayName>HHR1</displayName>
                <description>read-only</description>
                <addressOffset>0x314</addressOffset>
                <size>0x20</size>
@@ -1356,8 +1356,8 @@
                </fields>
             </register>
             <register>
-               <name>HASH_HR2</name>
-               <displayName>HASH_HR2</displayName>
+               <name>HHR2</name>
+               <displayName>HHR2</displayName>
                <description>read-only</description>
                <addressOffset>0x318</addressOffset>
                <size>0x20</size>
@@ -1373,8 +1373,8 @@
                </fields>
             </register>
             <register>
-               <name>HASH_HR3</name>
-               <displayName>HASH_HR3</displayName>
+               <name>HHR3</name>
+               <displayName>HHR3</displayName>
                <description>read-only</description>
                <addressOffset>0x31C</addressOffset>
                <size>0x20</size>
@@ -1390,8 +1390,8 @@
                </fields>
             </register>
             <register>
-               <name>HASH_HR4</name>
-               <displayName>HASH_HR4</displayName>
+               <name>HHR4</name>
+               <displayName>HHR4</displayName>
                <description>read-only</description>
                <addressOffset>0x320</addressOffset>
                <size>0x20</size>
@@ -1407,8 +1407,8 @@
                </fields>
             </register>
             <register>
-               <name>HASH_HR5</name>
-               <displayName>HASH_HR5</displayName>
+               <name>HHR5</name>
+               <displayName>HHR5</displayName>
                <description>read-only</description>
                <addressOffset>0x324</addressOffset>
                <size>0x20</size>
@@ -1424,8 +1424,8 @@
                </fields>
             </register>
             <register>
-               <name>HASH_HR6</name>
-               <displayName>HASH_HR6</displayName>
+               <name>HHR6</name>
+               <displayName>HHR6</displayName>
                <description>read-only</description>
                <addressOffset>0x328</addressOffset>
                <size>0x20</size>
@@ -1441,8 +1441,8 @@
                </fields>
             </register>
             <register>
-               <name>HASH_HR7</name>
-               <displayName>HASH_HR7</displayName>
+               <name>HHR7</name>
+               <displayName>HHR7</displayName>
                <description>read-only</description>
                <addressOffset>0x32C</addressOffset>
                <size>0x20</size>
@@ -8871,7 +8871,7 @@
                      <name>PLLM</name>
                      <description>Division factor for the main PLL (PLL)               and audio PLL (PLLI2S) input clock</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>5</bitWidth>
+                     <bitWidth>6</bitWidth>
                   </field>
                </fields>
             </register>
@@ -36316,7 +36316,7 @@
          </interrupt>
       </peripheral>
       <peripheral>
-         <name>Flash</name>
+         <name>FLASH</name>
          <description>FLASH</description>
          <groupName>FLASH</groupName>
          <baseAddress>0x40023C00</baseAddress>
@@ -37625,7 +37625,7 @@
             <value>88</value>
          </interrupt>
          <interrupt>
-            <name>LCD_TFT</name>
+            <name>LCD_TFT_ER</name>
             <description>LCD-TFT global Error interrupt</description>
             <value>89</value>
          </interrupt>
@@ -44624,20 +44624,22 @@
          </registers>
       </peripheral>
       <peripheral>
-         <name>USART6</name>
+
+         <name>USART1</name>
          <description>Universal synchronous asynchronous receiver       transmitter</description>
          <groupName>USART</groupName>
-         <baseAddress>0x40011400</baseAddress>
+         <baseAddress>0x40011000</baseAddress>
          <addressBlock>
             <offset>0x0</offset>
             <size>0x400</size>
             <usage>registers</usage>
          </addressBlock>
          <interrupt>
-            <name>USART6</name>
-            <description>USART6 global interrupt</description>
-            <value>71</value>
+            <name>USART1</name>
+            <description>USART1 global interrupt</description>
+            <value>37</value>
          </interrupt>
+
          <registers>
             <register>
                <name>CR1</name>
@@ -45452,16 +45454,18 @@
             </register>
          </registers>
       </peripheral>
-      <peripheral derivedFrom="USART6">
-         <name>USART1</name>
-         <baseAddress>0x40011000</baseAddress>
+      <peripheral derivedFrom="USART1">
+         <name>USART6</name>
+         <description>Universal synchronous asynchronous receiver       transmitter</description>
+         <groupName>USART</groupName>
+         <baseAddress>0x40011400</baseAddress>
          <interrupt>
-            <name>USART1</name>
-            <description>USART1 global interrupt</description>
-            <value>37</value>
+            <name>USART6</name>
+            <description>USART6 global interrupt</description>
+            <value>71</value>
          </interrupt>
       </peripheral>
-      <peripheral derivedFrom="USART6">
+      <peripheral derivedFrom="USART1">
          <name>USART3</name>
          <baseAddress>0x40004800</baseAddress>
          <interrupt>
@@ -45470,7 +45474,7 @@
             <value>39</value>
          </interrupt>
       </peripheral>
-      <peripheral derivedFrom="USART6">
+      <peripheral derivedFrom="USART1">
          <name>USART2</name>
          <baseAddress>0x40004400</baseAddress>
          <interrupt>
@@ -45479,7 +45483,7 @@
             <value>38</value>
          </interrupt>
       </peripheral>
-      <peripheral derivedFrom="USART6">
+      <peripheral derivedFrom="USART1">
          <name>UART5</name>
          <baseAddress>0x40005000</baseAddress>
          <interrupt>
@@ -45488,7 +45492,7 @@
             <value>53</value>
          </interrupt>
       </peripheral>
-      <peripheral derivedFrom="USART6">
+      <peripheral derivedFrom="USART1">
          <name>UART4</name>
          <baseAddress>0x40004C00</baseAddress>
          <interrupt>
@@ -45497,7 +45501,7 @@
             <value>52</value>
          </interrupt>
       </peripheral>
-      <peripheral derivedFrom="USART6">
+      <peripheral derivedFrom="USART1">
          <name>UART8</name>
          <baseAddress>0x40007C00</baseAddress>
          <interrupt>
@@ -45506,7 +45510,7 @@
             <value>83</value>
          </interrupt>
       </peripheral>
-      <peripheral derivedFrom="USART6">
+      <peripheral derivedFrom="USART1">
          <name>UART7</name>
          <baseAddress>0x40007800</baseAddress>
          <interrupt>
@@ -83086,8 +83090,8 @@
                </fields>
             </register>
             <register>
-               <name>SHCRS</name>
-               <displayName>SHCRS</displayName>
+               <name>SHCSR</name>
+               <displayName>SHCSR</displayName>
                <description>System handler control and state           register</description>
                <addressOffset>0x24</addressOffset>
                <size>0x20</size>
