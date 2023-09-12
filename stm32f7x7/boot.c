@@ -95,5 +95,33 @@ void Reset_Handler(void) {
 	stk_cvr_set_current(&STK, STK_RVR_RELOAD);
 	STK.CSR |= STK_CSR_CLKSOURCE | STK_CSR_TICKINT | STK_CSR_ENABLE;
 
+	__DSB();
+    __ISB();
+    SCB.ICIALLU = 0UL;      // invalidate I-Cache
+    __DSB();
+    __ISB();
+    SCB.CCR |= SCB_CCR_IC;  // enable I-Cache 
+    __DSB();
+    __ISB();
+
+    SCB.CSSELR = 0U;                       // select Level 1 data cache
+    __DSB();
+
+    uint32_t ccsidr = SCB.CCSIDR;
+
+                                            // invalidate D-Cache
+    for (uint32_t set = 0; set <= pf_ccsidr_get_numsets(&PF); ++set) {
+		for (uint32 way = 0; way <= pf_ccsidr_get_associativity(&PF); ++way {
+        SCB.DCISW = (sets << SCB_DCISW_SET) | (ways << SCB_DCISW_WAY);  // seems to be missing from the SVD
+    }
+    __DSB();
+
+    SCB.CCR |= SCB_CCR_DC;  // enable D-Cache
+
+    __DSB();
+    __ISB();
+
+    TODO enable ITCM/DTCM
+
 	main();
 }

@@ -138,7 +138,7 @@ func main() {
 
 				return
 			}
-			if state[len(state)-1] {
+			if all(state) {
 
 				m = reDef.FindStringSubmatch(s)
 				if len(m) > 0 {
@@ -152,6 +152,15 @@ func main() {
 		})
 
 	}
+}
+
+func all(vv []bool) bool {
+	for _, v := range vv {
+		if !v {
+			return false
+		}
+	}
+	return true
 }
 
 func forEachLine(fname string, fc func(fname string, lno int, s string)) {

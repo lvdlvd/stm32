@@ -23,7 +23,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
   <version>1.2</version>
   <description>STM32G031</description>
     <cpu>
-    <name>CM0</name>
+    <name>CM0plus</name>
     <revision>r0p1</revision>
     <endian>little</endian>
     <mpuPresent>true</mpuPresent>
