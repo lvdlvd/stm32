@@ -8450,8 +8450,8 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <bitWidth>1</bitWidth>
             </field>
             <field>
-              <name>USART1EN</name>
-              <description>USART1 clock enable</description>
+              <name>USART3EN</name>
+              <description>USART3 clock enable</description>
               <bitOffset>18</bitOffset>
               <bitWidth>1</bitWidth>
             </field>
@@ -8468,8 +8468,8 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <bitWidth>1</bitWidth>
             </field>
             <field>
-              <name>SPI1EN</name>
-              <description>SPI1 clock enable</description>
+              <name>SPI2EN</name>
+              <description>SPI2 clock enable</description>
               <bitOffset>14</bitOffset>
               <bitWidth>1</bitWidth>
             </field>
