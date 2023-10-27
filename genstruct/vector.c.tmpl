@@ -31,7 +31,7 @@ void SysTick_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void {{.Name}}_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 {{- end}}
 
-__attribute__((section(".isr_vector"))) void (*vector_table[])(void) = {
+__attribute__((section(".isr_vector"))) void (* const vector_table[])(void) = {
     _estack,
     Reset_Handler,
     NonMaskableInt_Handler,
