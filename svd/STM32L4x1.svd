@@ -1069,6 +1069,12 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
           <resetValue>0x00000000</resetValue>
           <fields>
             <field>
+              <name>DUMMY</name>
+              <description>force this to be a 32 bit register</description>
+              <bitOffset>31</bitOffset>
+              <bitWidth>1</bitWidth>
+            </field>
+            <field>
               <name>MEM2MEM</name>
               <description>Memory to memory mode</description>
               <bitOffset>14</bitOffset>
@@ -1159,7 +1165,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <name>NDT</name>
               <description>Number of data to transfer</description>
               <bitOffset>0</bitOffset>
-              <bitWidth>16</bitWidth>
+              <bitWidth>32</bitWidth>
             </field>
           </fields>
         </register>
@@ -1209,6 +1215,12 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
+            <field>
+              <name>DUMMY</name>
+              <description>force this to be a 32 bit register</description>
+              <bitOffset>31</bitOffset>
+              <bitWidth>1</bitWidth>
+            </field>
             <field>
               <name>MEM2MEM</name>
               <description>Memory to memory mode</description>
@@ -1300,7 +1312,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <name>NDT</name>
               <description>Number of data to transfer</description>
               <bitOffset>0</bitOffset>
-              <bitWidth>16</bitWidth>
+              <bitWidth>32</bitWidth>
             </field>
           </fields>
         </register>
@@ -1350,6 +1362,12 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
+            <field>
+              <name>DUMMY</name>
+              <description>force this to be a 32 bit register</description>
+              <bitOffset>31</bitOffset>
+              <bitWidth>1</bitWidth>
+            </field>
             <field>
               <name>MEM2MEM</name>
               <description>Memory to memory mode</description>
@@ -1441,7 +1459,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <name>NDT</name>
               <description>Number of data to transfer</description>
               <bitOffset>0</bitOffset>
-              <bitWidth>16</bitWidth>
+              <bitWidth>32</bitWidth>
             </field>
           </fields>
         </register>
@@ -1491,6 +1509,12 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
+            <field>
+              <name>DUMMY</name>
+              <description>force this to be a 32 bit register</description>
+              <bitOffset>31</bitOffset>
+              <bitWidth>1</bitWidth>
+            </field>
             <field>
               <name>MEM2MEM</name>
               <description>Memory to memory mode</description>
@@ -1582,7 +1606,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <name>NDT</name>
               <description>Number of data to transfer</description>
               <bitOffset>0</bitOffset>
-              <bitWidth>16</bitWidth>
+              <bitWidth>32</bitWidth>
             </field>
           </fields>
         </register>
@@ -1632,6 +1656,12 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
+            <field>
+              <name>DUMMY</name>
+              <description>force this to be a 32 bit register</description>
+              <bitOffset>31</bitOffset>
+              <bitWidth>1</bitWidth>
+            </field>
             <field>
               <name>MEM2MEM</name>
               <description>Memory to memory mode</description>
@@ -1723,7 +1753,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <name>NDT</name>
               <description>Number of data to transfer</description>
               <bitOffset>0</bitOffset>
-              <bitWidth>16</bitWidth>
+              <bitWidth>32</bitWidth>
             </field>
           </fields>
         </register>
@@ -1773,6 +1803,13 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
+            <field>
+              <name>DUMMY</name>
+              <description>force this to be a 32 bit register</description>
+              <bitOffset>31</bitOffset>
+              <bitWidth>1</bitWidth>
+            </field>
+
             <field>
               <name>MEM2MEM</name>
               <description>Memory to memory mode</description>
@@ -1864,7 +1901,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <name>NDT</name>
               <description>Number of data to transfer</description>
               <bitOffset>0</bitOffset>
-              <bitWidth>16</bitWidth>
+              <bitWidth>32</bitWidth>
             </field>
           </fields>
         </register>
@@ -1914,6 +1951,12 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
           <access>read-write</access>
           <resetValue>0x00000000</resetValue>
           <fields>
+            <field>
+              <name>DUMMY</name>
+              <description>force this to be a 32 bit register</description>
+              <bitOffset>31</bitOffset>
+              <bitWidth>1</bitWidth>
+            </field>
             <field>
               <name>MEM2MEM</name>
               <description>Memory to memory mode</description>
@@ -2005,7 +2048,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <name>NDT</name>
               <description>Number of data to transfer</description>
               <bitOffset>0</bitOffset>
-              <bitWidth>16</bitWidth>
+              <bitWidth>32</bitWidth>
             </field>
           </fields>
         </register>
@@ -8877,7 +8920,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <bitWidth>1</bitWidth>
             </field>
             <field>
-              <name>SP3SMEN</name>
+              <name>SPI3SMEN</name>
               <description>SPI3 clocks enable during Sleep and Stop
               modes</description>
               <bitOffset>15</bitOffset>
