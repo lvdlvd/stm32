@@ -13685,6 +13685,254 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
         </register>
       </registers>
     </peripheral>
+
+    <!-- copied from STM32G4xx -->
+      <peripheral>
+         <name>ADC12_Common</name>
+         <description>Analog-to-Digital Converter</description>
+         <groupName>ADC</groupName>
+         <baseAddress>0x50000300</baseAddress>
+         <addressBlock>
+            <offset>0x0</offset>
+            <size>0x11</size>
+            <usage>registers</usage>
+         </addressBlock>
+         <registers>
+            <register>
+               <name>CSR</name>
+               <displayName>CSR</displayName>
+               <description>ADC Common status register</description>
+               <addressOffset>0x0</addressOffset>
+               <size>0x20</size>
+               <access>read-only</access>
+               <resetValue>0x00000000</resetValue>
+               <fields>
+                  <field>
+                     <name>ADDRDY_MST</name>
+                     <description>ADDRDY_MST</description>
+                     <bitOffset>0</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>EOSMP_MST</name>
+                     <description>EOSMP_MST</description>
+                     <bitOffset>1</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>EOC_MST</name>
+                     <description>EOC_MST</description>
+                     <bitOffset>2</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>EOS_MST</name>
+                     <description>EOS_MST</description>
+                     <bitOffset>3</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>OVR_MST</name>
+                     <description>OVR_MST</description>
+                     <bitOffset>4</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>JEOC_MST</name>
+                     <description>JEOC_MST</description>
+                     <bitOffset>5</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>JEOS_MST</name>
+                     <description>JEOS_MST</description>
+                     <bitOffset>6</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>AWD1_MST</name>
+                     <description>AWD1_MST</description>
+                     <bitOffset>7</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>AWD2_MST</name>
+                     <description>AWD2_MST</description>
+                     <bitOffset>8</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>AWD3_MST</name>
+                     <description>AWD3_MST</description>
+                     <bitOffset>9</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>JQOVF_MST</name>
+                     <description>JQOVF_MST</description>
+                     <bitOffset>10</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>ADRDY_SLV</name>
+                     <description>ADRDY_SLV</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>EOSMP_SLV</name>
+                     <description>EOSMP_SLV</description>
+                     <bitOffset>17</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>EOC_SLV</name>
+                     <description>End of regular conversion of the slave               ADC</description>
+                     <bitOffset>18</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>EOS_SLV</name>
+                     <description>End of regular sequence flag of the               slave ADC</description>
+                     <bitOffset>19</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>OVR_SLV</name>
+                     <description>Overrun flag of the slave               ADC</description>
+                     <bitOffset>20</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>JEOC_SLV</name>
+                     <description>End of injected conversion flag of the               slave ADC</description>
+                     <bitOffset>21</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>JEOS_SLV</name>
+                     <description>End of injected sequence flag of the               slave ADC</description>
+                     <bitOffset>22</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>AWD1_SLV</name>
+                     <description>Analog watchdog 1 flag of the slave               ADC</description>
+                     <bitOffset>23</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>AWD2_SLV</name>
+                     <description>Analog watchdog 2 flag of the slave               ADC</description>
+                     <bitOffset>24</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>AWD3_SLV</name>
+                     <description>Analog watchdog 3 flag of the slave               ADC</description>
+                     <bitOffset>25</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>JQOVF_SLV</name>
+                     <description>Injected Context Queue Overflow flag of               the slave ADC</description>
+                     <bitOffset>26</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+               </fields>
+            </register>
+            <register>
+               <name>CCR</name>
+               <displayName>CCR</displayName>
+               <description>ADC common control register</description>
+               <addressOffset>0x8</addressOffset>
+               <size>0x20</size>
+               <access>read-write</access>
+               <resetValue>0x00000000</resetValue>
+               <fields>
+                  <field>
+                     <name>DUAL</name>
+                     <description>Dual ADC mode selection</description>
+                     <bitOffset>0</bitOffset>
+                     <bitWidth>5</bitWidth>
+                  </field>
+                  <field>
+                     <name>DELAY</name>
+                     <description>Delay between 2 sampling               phases</description>
+                     <bitOffset>8</bitOffset>
+                     <bitWidth>4</bitWidth>
+                  </field>
+                  <field>
+                     <name>DMACFG</name>
+                     <description>DMA configuration (for multi-ADC               mode)</description>
+                     <bitOffset>13</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>MDMA</name>
+                     <description>Direct memory access mode for multi ADC               mode</description>
+                     <bitOffset>14</bitOffset>
+                     <bitWidth>2</bitWidth>
+                  </field>
+                  <field>
+                     <name>CKMODE</name>
+                     <description>ADC clock mode</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>2</bitWidth>
+                  </field>
+                  <field>
+                     <name>VREFEN</name>
+                     <description>VREFINT enable</description>
+                     <bitOffset>22</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>VSENSESEL</name>
+                     <description> VTS selection</description>
+                     <bitOffset>23</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>VBATSEL</name>
+                     <description>VBAT selection</description>
+                     <bitOffset>24</bitOffset>
+                     <bitWidth>1</bitWidth>
+                  </field>
+                  <field>
+                     <name>PRESC</name>
+                     <description>ADC prescaler</description>
+                     <bitOffset>18</bitOffset>
+                     <bitWidth>4</bitWidth>
+                  </field>
+               </fields>
+            </register>
+            <register>
+               <name>CDR</name>
+               <displayName>CDR</displayName>
+               <description>ADC common regular data register for dual           and triple modes</description>
+               <addressOffset>0xC</addressOffset>
+               <size>0x20</size>
+               <access>read-only</access>
+               <resetValue>0x00000000</resetValue>
+               <fields>
+                  <field>
+                     <name>RDATA_SLV</name>
+                     <description>Regular data of the slave               ADC</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+                  <field>
+                     <name>RDATA_MST</name>
+                     <description>Regular data of the master               ADC</description>
+                     <bitOffset>0</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+               </fields>
+            </register>
+         </registers>
+      </peripheral>
+
+
     <peripheral>
       <name>GPIOA</name>
       <description>General-purpose I/Os</description>
