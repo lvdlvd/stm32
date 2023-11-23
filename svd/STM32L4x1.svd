@@ -13061,6 +13061,12 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
               <bitOffset>3</bitOffset>
               <bitWidth>3</bitWidth>
             </field>
+            <field>
+              <name>SMP0</name>
+              <description>SMP0</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>3</bitWidth>
+            </field>
           </fields>
         </register>
         <register>
@@ -13691,7 +13697,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
          <name>ADC12_Common</name>
          <description>Analog-to-Digital Converter</description>
          <groupName>ADC</groupName>
-         <baseAddress>0x50000300</baseAddress>
+         <baseAddress>0x50040300</baseAddress>
          <addressBlock>
             <offset>0x0</offset>
             <size>0x11</size>
