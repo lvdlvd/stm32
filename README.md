@@ -19,6 +19,7 @@ Devices are of type struct XXXX_Type, with the registers at the correct offset, 
 known to the linker, so the compiler and linker generate very clean and optimal code.
 
 TODO: 
+- consistently redo the CMSIS headers for all cortex families.  preproc is a start. 
 - if there is only 1 device of a certain kind, omit the struct DeviceType* dev argument on the methods.
 - for the most common base class device, omit the instance number from the type name.  currently we have USART1_Type, which gets
 reused for all devices that are exact copies (registers and bits within registers).  the TIMx... are a bit confusing too. 
