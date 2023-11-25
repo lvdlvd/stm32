@@ -63,16 +63,6 @@ void USB_LP_Handler(void) {
 	}
 }
 
-void TIM3_IRQ_Handler(void) {
-	if ((TIM3.SR & TIM1_SR_UIF) == 0) {
-		return;
-	}
-	TIM3.SR &= ~TIM1_SR_UIF;
-	static int i = 0;
-	cbprintf(u2puts, "USB %i: %s\n", i, usb_state_str(usb_state()));
-	cbprintf(usb_puts, "bingo %i\n", i++);
-}
-
 void TIM3_Handler(void) {
 	if ((TIM3.SR & TIM1_SR_UIF) == 0) {
 		return;
@@ -82,6 +72,8 @@ void TIM3_Handler(void) {
 	cbprintf(
 			u2puts, "  fnr %u lsof %u D%s%s%s\n", usb_fnr_get_fn(), usb_fnr_get_lsof(), ((USB.FNR & USB_FNR_RXDP) ? "P" : "_"),
 			((USB.FNR & USB_FNR_RXDM) ? "M" : "_"), ((USB.FNR & USB_FNR_LCK) ? " LCK" : ""));
+    static int i = 0;
+    cbprintf(usb_puts, "bingo %i\n", i++);
 }
 
 void main(void) __attribute__((noreturn));
