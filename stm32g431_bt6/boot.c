@@ -53,21 +53,21 @@ static int setSysClockTo144MHz(void) {
 	rcc_cfgr_set_ppre2(&RCC, 0); // APB2 PCLK = AHB HCLK 
 
 	// Configure the main PLL 
-	// if ((RCC.CR & RCC_CR_HSERDY) == 0) {
-	// 	// HSE clock failed to become ready
-	// 	rcc_pllcfgr_set_pllsrc(&RCC, 2);   // select 2:HSI source (16MHz)
-	// 	rcc_pllcfgr_set_pllm(&RCC, 1);     // 0..15       : vco_in = HSI / (1+m)  2..16MHz   16/2 = 8MHz
-	// } else {
+	if ((RCC.CR & RCC_CR_HSERDY) == 0) {
+		// HSE clock failed to become ready
+		rcc_pllcfgr_set_pllsrc(&RCC, 2);   // select 2:HSI source (16MHz)
+		rcc_pllcfgr_set_pllm(&RCC, 1);     // 0..15       : vco_in = HSI / (1+m)  2..16MHz   16/2 = 8MHz
+	} else {
 		rcc_pllcfgr_set_pllsrc(&RCC, 3);   // select 2:HSE source (24MHz)		
 		rcc_pllcfgr_set_pllm(&RCC, 2);     // 0..15       : vco_in = HSE / (1+m)  2..16MHz    24/3 = 8MHz
-	// }
+	}
 
 	rcc_pllcfgr_set_plln(&RCC, 36);     // 8...127     : vco_out = vco_in * n = 96...344MHz    8 * 36 = 288MHz
-	rcc_pllcfgr_set_pllr(&RCC, 0); 		// 0,1,2,3 -> r=2,4,6,8  : sysclk = vco_out / r <= 170MHz  8 * 36 / 2 = 144MHz
-	rcc_pllcfgr_set_pllq(&RCC, 2); 		// 0,1,2,3 -> q=2,4,6,8  :   8 * 36 / 6 =  48MHz
-	//rcc_pllcfgr_set_pllpdiv(&RCC, 2);   // :   8 * 36 / 2 =  144MHz
+	rcc_pllcfgr_set_pllr(&RCC, 0); 		// 0,1,2,3 -> p=2,4,6,8  : sysclk = vco_out / p <= 170MHz  8 * 36 / 2 = 144MHz
+	rcc_pllcfgr_set_pllq(&RCC, 2); 		// 0,1,2,3 -> p=2,4,6,8  :   8 * 36 / 6 =  48MHz
 	
-	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN| RCC_PLLCFGR_PLLQEN;
+	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN | RCC_PLLCFGR_PLLQEN;
+
 	RCC.CR |= RCC_CR_PLLON;
 
 	// set the USB clock to PLLQ

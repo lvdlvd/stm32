@@ -25,17 +25,19 @@ static struct gpio_config_t {
     {0, 0}, // sentinel
 };
 
-enum { IRQ_PRIORITY_GROUPING = 5 }; // prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
+enum { IRQ_PRIORITY_GROUPING_2_2 = 5 }; // prio[7:6] : 4 groups,  prio[5:4] : 4 subgroups
+#define PRIO(group, subgroup) ((group<<6) | (subgroup<<4))
 struct {
     enum IRQn_Type irq;
-    uint8_t        group, sub;
+    uint8_t        prio;
 } irqprios[] = {
-    {SysTick_IRQn, 0, 0},
-    {USART2_IRQn,  1, 0},
-    {USB_LP_IRQn,  2, 0},
-    {TIM3_IRQn,    3, 0},
-    {None_IRQn, 0xff, 0xff},
+    {SysTick_IRQn, PRIO(0, 0)},
+    {USART2_IRQn,  PRIO(1, 0)},
+    {USB_LP_IRQn,  PRIO(2, 0)},
+    {TIM3_IRQn,    PRIO(3, 0)},
+    {None_IRQn, 0xff},
 };
+#undef PRIO
 /* clang-format on */
 
 static inline void led0_off(void) { digitalLo(LED0_PIN); }
@@ -46,18 +48,28 @@ extern uint32_t UNIQUE_DEVICE_ID[3]; // Section 48.1
 
 static struct Ringbuffer usart2tx;
 void                     USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
- size_t            u2puts(const char* buf, size_t len) { return usart_puts(&USART2, &usart2tx, buf, len); }
-//static size_t 			 usb_puts(const char* buf, size_t len) { return usb_send(buf, len); }
+size_t            u2puts(const char* buf, size_t len) { return usart_puts(&USART2, &usart2tx, buf, len); }
+static size_t 			 usb_puts(const char* buf, size_t len) { return usb_send(buf, len); }
 
 void USB_LP_Handler(void) {
     uint64_t now = cycleCount();
     led0_toggle();
-    cbprintf(u2puts, "%lld USB IRQ: %s\n", now / 72, usb_state_str(usb_state()));
+    static int i = 0;
+    cbprintf(u2puts, "%lld IRQ %i: %s\n", now / 72, i++, usb_state_str(usb_state()));
     uint8_t buf[64];
     size_t  len = usb_recv(buf, sizeof buf);
     if (len > 0) {
         cbprintf(u2puts, "received %i: %*s\n", len, len, buf);
     }
+}
+
+void TIM3_IRQ_Handler(void) {
+    if ((TIM3.SR & TIM1_SR_UIF) == 0)
+        return;
+    TIM3.SR &= ~TIM1_SR_UIF;
+    static int i = 0;
+    cbprintf(u2puts, "USB %i: %s\n", i, usb_state_str(usb_state()));
+    cbprintf(usb_puts, "bingo %i\n", i++);
 }
 
 void TIM3_Handler(void) {
@@ -78,9 +90,9 @@ void main(void) {
 	uint8_t rf = (RCC.CSR >> 24) & 0xfc;
 	RCC.CSR |= RCC_CSR_RMVF; // Set RMVF bit to clear the reset flags
 
-    NVIC_SetPriorityGrouping(IRQ_PRIORITY_GROUPING);
+    NVIC_SetPriorityGrouping(IRQ_PRIORITY_GROUPING_2_2);
     for (int i = 0; irqprios[i].irq != None_IRQn; i++) {
-        NVIC_SetPriority(irqprios[i].irq, NVIC_EncodePriority(IRQ_PRIORITY_GROUPING, irqprios[i].group, irqprios[i].sub));
+        NVIC_SetPriority(irqprios[i].irq, irqprios[i].prio);
     }
 
 
@@ -110,6 +122,7 @@ void main(void) {
     NVIC_EnableIRQ(TIM3_IRQn);
 
 #if 0
+    // use HSI48 + clock recovery system for the USB clock
 	RCC_APB1ENR1 |= RCC_APB1ENR1_CRSEN;
 	RCC.CRRCR |= RCC_CRRCR_HSI48ON;
 	while((RCC.CRRCR & RCC_CRRCR_HSI48RDY) == 0)
@@ -127,11 +140,14 @@ void main(void) {
     // which may have a pull-down effect on CC1 and CC2 pins. It is recommended to disable it in all cases, either to stop this 
     // pull-down or to hand over control to the UCPD1 (which should therefore be initialized before doing the disable).
 
-    RCC.APB1ENR1 |= RCC_APB1ENR1_PWREN; // WAS THIS IT? TEST!
+    RCC.APB1ENR1 |= RCC_APB1ENR1_PWREN; // WAS THIS IT? NO!
     PWR.CR3 |= PWR_CR3_UCPD1_DBDIS; 
 
-    NVIC_EnableIRQ(USB_LP_IRQn);
     usb_init();
+
+    cbprintf(u2puts, "USB after init: %s\n", usb_state_str(usb_state()));
+
+    NVIC_EnableIRQ(USB_LP_IRQn);
 
  	for (;;)
         __WFI(); // wait for interrupt to change the state of any of the subsystems

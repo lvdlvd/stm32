@@ -6,8 +6,9 @@
 #include "usb.h"
 #include "stm32g4usb.h"
 
+// for debug print statements
 #include "printf.h"
-extern size_t u2puts(const char* buf, size_t len);
+extern size_t u2puts(const char* buf, size_t len);  // in main.c
 
 
 static enum usb_state_t _usb_state = USB_UNATTACHED;
@@ -156,8 +157,8 @@ size_t usb_recv(uint8_t* buf, size_t sz) {
         USB.CNTR &= ~(USB_CNTR_RESUME | USB_CNTR_FSUSP | USB_CNTR_LPMODE | USB_CNTR_PDWN | USB_CNTR_FRES);
 
         usb_ep_config(0, USB_EP_TYPE_CONTROL, 0);
-        usb_ep_set_stat_tx(0, USB_EP_STAT_NAK); // only setup will succeed  
-        usb_ep_set_stat_rx(0, USB_EP_STAT_VALID);
+        usb_ep_set_stat_tx(0, USB_EP_STAT_STALL); 
+        usb_ep_set_stat_rx(0, USB_EP_STAT_STALL); // only setup will succeed 
 
         for (int i = 1; i < 8; ++i) {
             usb_ep_reset(i);
