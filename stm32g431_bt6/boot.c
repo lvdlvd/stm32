@@ -32,9 +32,11 @@ static int setSysClockTo144MHz(void) {
 	RCC.CR |= RCC_CR_HSEON;
 
 //	for (int i = 0; i < HSE_RDY_TIMEOUT; i++)
-	for(;;)
-		if (RCC.CR & RCC_CR_HSERDY)
+	for(;;) {
+		if (RCC.CR & RCC_CR_HSERDY) {
 			break;
+}
+}
 
 	// Power control
 	RCC.APB1ENR1 |= RCC_APB1ENR1_PWREN;
@@ -46,8 +48,9 @@ static int setSysClockTo144MHz(void) {
 
 	// After a write operation to these bits and before decreasing the voltage range, 
 	// this register must be read to be sure that the new value has been taken into account.
-	while (rcc_cfgr_get_hpre(&RCC) != 8)
+	while (rcc_cfgr_get_hpre(&RCC) != 8) {
 		__NOP();
+}
 
 	rcc_cfgr_set_ppre1(&RCC, 0); // APB1 PCLK = AHB HCLK 
 	rcc_cfgr_set_ppre2(&RCC, 0); // APB2 PCLK = AHB HCLK 
@@ -77,23 +80,27 @@ static int setSysClockTo144MHz(void) {
 	FLASH.ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
 	flash_acr_set_latency(&FLASH, 4);  // 4 wait states (5 cycles) cpf p.150 table 19
 
-	while(flash_acr_get_latency(&FLASH) != 4)
+	while(flash_acr_get_latency(&FLASH) != 4) {
 		__NOP();
+}
 
 	// Wait till PLL is ready
-	while ((RCC.CR & RCC_CR_PLLRDY) == 0)
+	while ((RCC.CR & RCC_CR_PLLRDY) == 0) {
 		__NOP();
+}
 
 
 	rcc_cfgr_set_sw(&RCC, 3); // Select PLL as system clock source
 
 	// Wait till PLL is used as system clock source
-	while (rcc_cfgr_get_sws(&RCC) != 3)
+	while (rcc_cfgr_get_sws(&RCC) != 3) {
 		__NOP();
+}
 
 	// delay 1us, hclock is still at 72MHz
-	for(int i = 0; i < 72; i++)
+	for(int i = 0; i < 72; i++) {
 		__NOP();
+}
 
 	rcc_cfgr_set_hpre(&RCC, 0);  // AHB HCLK = SYSCLK =  144MHz
 
@@ -104,11 +111,13 @@ void Reset_Handler(void) {
 	char* src = &_sidata;
 	char* dst = &_sdata;
 
-	while (dst < &_edata)
+	while (dst < &_edata) {
 		*dst++ = *src++;
+}
 
-	for (dst = &_sbss; dst < &_ebss; dst++)
+	for (dst = &_sbss; dst < &_ebss; dst++) {
 		*dst = 0;
+}
 
 	SCB.VTOR = (uintptr_t)&vector_table; /* Vector Table Relocation in Internal FLASH. */
 
@@ -118,8 +127,9 @@ void Reset_Handler(void) {
 
 	systemInit();
 
-	while (!setSysClockTo144MHz())
+	while (!setSysClockTo144MHz()) {
 	 	__NOP();
+}
 
 	stk_load_set_reload(&STK, STK_LOAD_RELOAD);
 	stk_val_set_current(&STK, STK_LOAD_RELOAD);

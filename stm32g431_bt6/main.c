@@ -64,8 +64,9 @@ void USB_LP_Handler(void) {
 }
 
 void TIM3_IRQ_Handler(void) {
-    if ((TIM3.SR & TIM1_SR_UIF) == 0)
+    if ((TIM3.SR & TIM1_SR_UIF) == 0) {
         return;
+}
     TIM3.SR &= ~TIM1_SR_UIF;
     static int i = 0;
     cbprintf(u2puts, "USB %i: %s\n", i, usb_state_str(usb_state()));
@@ -73,8 +74,9 @@ void TIM3_IRQ_Handler(void) {
 }
 
 void TIM3_Handler(void) {
-    if ((TIM3.SR & TIM1_SR_UIF) == 0)
+    if ((TIM3.SR & TIM1_SR_UIF) == 0) {
         return;
+}
     TIM3.SR &= ~TIM1_SR_UIF;
     cbprintf(u2puts, "USB %s\n", usb_state_str(usb_state()));
     cbprintf(u2puts, "  fnr %u lsof %u D%s%s%s\n",  usb_fnr_get_fn(), usb_fnr_get_lsof(), 
@@ -149,7 +151,8 @@ void main(void) {
 
     NVIC_EnableIRQ(USB_LP_IRQn);
 
- 	for (;;)
+ 	for (;;) {
         __WFI(); // wait for interrupt to change the state of any of the subsystems
+}
 
 }

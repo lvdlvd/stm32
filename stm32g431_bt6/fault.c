@@ -26,8 +26,9 @@ static inline void setSysclockToHSI16(void) {
 #endif
 
 static void putc_(char c) {
-	while ((USART2.ISR & USART_ISR_TXE) == 0)
+	while ((USART2.ISR & USART_ISR_TXE) == 0) {
 		__NOP();
+}
 	USART2.TDR = c;
 }
 
@@ -136,8 +137,9 @@ static void handlefault(uint32_t stack, const char* lbl) {
 	}
 	printflags(cfsr, cfsrflags, "\n");
 	dbg_printf("\n------HALT\n");
-	for (;;)
+	for (;;) {
 		__NOP();
+}
 }
 
 void HardFault_Handler(void) __attribute__ ((naked));
@@ -157,7 +159,8 @@ void unhandled_interrupt(uint32_t irq) {
 
 	dbg_printf("Unhandled IRQ %x\n----HALT\n", irq);
 	__BKPT(1);
-	for (;;)
+	for (;;) {
 		__NOP();
+}
 
 }

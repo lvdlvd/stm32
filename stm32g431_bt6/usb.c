@@ -22,8 +22,9 @@ static const char * const _sstr[] = {
 
 const char* usb_state_str(enum usb_state_t s) {
     size_t ss = s;
-    if (ss >= sizeof _sstr)
+    if (ss >= sizeof _sstr) {
         ss = sizeof _sstr - 1;
+}
     return _sstr[ss];
 }
 
@@ -390,8 +391,9 @@ static int handle_set_request() {
         //    return 0; // no features implemented at device or interface level
 
     case REQ_CLR_FEATURE_ENDPOINT:
-        if ((_usb_state != USB_CONFIGURED) || ((_ctrl_req.idx & 0xf) != 1))
+        if ((_usb_state != USB_CONFIGURED) || ((_ctrl_req.idx & 0xf) != 1)) {
             return 0;
+}
         if (_ctrl_req.idx & 0x80) {
             usb_ep_set_stat_tx(1, USB_EP_STAT_NAK);
             usb_ep_clr_dtog_tx(1);
@@ -402,8 +404,9 @@ static int handle_set_request() {
         return 1;
 
     case REQ_SET_FEATURE_ENDPOINT:
-        if ((_usb_state != USB_CONFIGURED) || ((_ctrl_req.idx & 0xf) != 1))
+        if ((_usb_state != USB_CONFIGURED) || ((_ctrl_req.idx & 0xf) != 1)) {
             return 0;
+}
         if (_ctrl_req.idx & 0x80) {
             usb_ep_set_stat_tx(1, USB_EP_STAT_STALL);
         } else {
@@ -422,8 +425,9 @@ static int handle_get_request() {
 
     switch (_ctrl_req.req) {
     case REQ_GET_DESCRIPTOR:
-        if (_ctrl_req.idx != 0)
+        if (_ctrl_req.idx != 0) {
             return 0;
+}
         switch (_ctrl_req.val) {
         case 0x0100:
             len = write_buffer(0, _deviceDescriptor, sizeof _deviceDescriptor);
@@ -434,23 +438,27 @@ static int handle_get_request() {
         default:
             return 0;
         }
-        if (len > _ctrl_req.len)
+        if (len > _ctrl_req.len) {
             usb_ep_set_tx_count(0, _ctrl_req.len);
+}
         return 1;
 
     case REQ_GET_STATUS:
-        if ((_usb_state == USB_DEFAULT) || (_ctrl_req.val != 0) || (_ctrl_req.idx != 0) || (_ctrl_req.len != 2))
+        if ((_usb_state == USB_DEFAULT) || (_ctrl_req.val != 0) || (_ctrl_req.idx != 0) || (_ctrl_req.len != 2)) {
             return 0;
+}
         break;
 
     case REQ_GET_STATUS_INTERFACE:
-        if ((_usb_state == USB_DEFAULT) || (_ctrl_req.val != 0) || (_ctrl_req.idx != 0) || (_ctrl_req.len != 2))
+        if ((_usb_state == USB_DEFAULT) || (_ctrl_req.val != 0) || (_ctrl_req.idx != 0) || (_ctrl_req.len != 2)) {
             return 0;
+}
         break;
 
     case REQ_GET_STATUS_ENDPOINT:
-        if ((_usb_state == USB_DEFAULT) || (_ctrl_req.val != 0) || (_ctrl_req.len != 2))
+        if ((_usb_state == USB_DEFAULT) || (_ctrl_req.val != 0) || (_ctrl_req.len != 2)) {
             return 0;
+}
         switch (_ctrl_req.idx) {
         case 0x00:
             data[0] = (usb_ep_get_stat_rx(0) == USB_EP_STAT_STALL) ? 1 : 0;
@@ -470,14 +478,16 @@ static int handle_get_request() {
         break;
 
     case REQ_GET_CONFIGURATION:
-        if ((_usb_state == USB_DEFAULT) || (_ctrl_req.len != 1))
+        if ((_usb_state == USB_DEFAULT) || (_ctrl_req.len != 1)) {
             return 0;
+}
         data[0] = (_usb_state == USB_CONFIGURED) ? 1 : 0;
         break;
 
     case REQ_GET_INTERFACE:
-        if ((_usb_state != USB_CONFIGURED) || (_ctrl_req.len != 1))
+        if ((_usb_state != USB_CONFIGURED) || (_ctrl_req.len != 1)) {
             return 0;
+}
         break;
     }
 
@@ -509,16 +519,19 @@ static void handle_ep0(void) {
         
         // if non-zero length request and direction is OUT
         // there's no request we can handle so bail out straightaway
-        if ((_ctrl_req.len > 0) && !(_ctrl_req.req & REQ_TYPE_TX))
+        if ((_ctrl_req.len > 0) && !(_ctrl_req.req & REQ_TYPE_TX)) {
             break;
+}
 
         if (_ctrl_req.len == 0) {
-            if (!handle_set_request())
+            if (!handle_set_request()) {
                 break;
+}
             usb_ep_set_tx_count(0, 0); // ZLP status-in reply
         } else {
-            if (!handle_get_request()) // sets up reply buffer
+            if (!handle_get_request()) { // sets up reply buffer
                break;
+}
         }
 
         usb_ep_set_stat_tx(0, USB_EP_STAT_VALID);
@@ -547,8 +560,9 @@ static void handle_ep0(void) {
 
     case USB_EPRx_CTR_RX: // RX, USB OUT the final status zero lenght reply from the host to the GET
 
-        if (usb_ep_get_rx_count(0) != 0)
+        if (usb_ep_get_rx_count(0) != 0) {
             break;
+}
 
         usb_ep_clr_ctr_rx(0); // should be done automatically by STATUS_OUT mechanism, but apparently not
 
