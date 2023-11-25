@@ -18,11 +18,13 @@ static inline void NVIC_SetPriorityGrouping(uint32_t val) {
 // bits 7:4 of pri are used as per grouping setting
 static inline void NVIC_SetPriority(enum IRQn_Type IRQn, uint8_t pri) {
 	if (IRQn < 0) {
-		((uint8_t*)(&SCB.SHPR1))[IRQn + 12] = pri;
+		((uint8_t *)(&SCB.SHPR1))[IRQn + 12] = pri;
 	} else {
-		((uint8_t*)(&NVIC.IPR0))[IRQn] = pri;
+		((uint8_t *)(&NVIC.IPR0))[IRQn] = pri;
 	}
 }
 
-static inline void NVIC_EnableIRQ(enum IRQn_Type IRQn) { (&NVIC.ISER0)[IRQn >> 5] = 1U << (IRQn & 0x1F); }  // how did this ever work with irqn == -1?
+static inline void NVIC_EnableIRQ(enum IRQn_Type IRQn) {
+	(&NVIC.ISER0)[IRQn >> 5] = 1U << (IRQn & 0x1F);
+}  // how did this ever work with irqn == -1?
 static inline void NVIC_DisableIRQ(enum IRQn_Type IRQn) { (&NVIC.ICER0)[IRQn >> 5] = 1U << (IRQn & 0x1F); }

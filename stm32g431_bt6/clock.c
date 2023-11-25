@@ -23,6 +23,6 @@ void delay(uint32_t usec) {
 	then /= 1000000;
 	then += now;
 	while (cycleCount() < then) {
-		__NOP(); // wait
-}
+		__NOP();  // wait
+	}
 }
