@@ -176,17 +176,17 @@ enum {
 };
 
 // 45.6.2 Buffer descriptor table
-//  The packet memory should be accessed only by byte (8-bit) or half-word (16-bit) accesses. Word (32-bit) accesses are not
-//  allowed.
+//  The packet memory should be accessed only by byte (8-bit) or half-word (16-bit) accesses. 
+//  Word (32-bit) accesses are not allowed.
 extern union {
 	struct {
-		volatile uint32_t ADDR_TX;	// in units of uint16, always even
-		volatile uint32_t COUNT_TX;
-		volatile uint32_t ADDR_RX;
-		volatile uint32_t COUNT_RX;
+		volatile uint16_t ADDR_TX;	// in units of uint16, always even
+		volatile uint16_t COUNT_TX;
+		volatile uint16_t ADDR_RX;
+		volatile uint16_t COUNT_RX;
 	} btable[8];		// located here by virtue of USB.BTABLE being zero
-	uint16_t buf[512];	// interspersed, even index: 2 bytes data, odd index: 2 bytes reserved, only accessible as uint16 or uint8
-} USB_PMA;				// @ 0x50006000
+	uint16_t buf[512];	// only accessible as uint16 or uint8
+} USB_PMA;				// @ 0x40006000
 
 enum {
 	USB_PMA_COUNT_BLSIZE	= 1UL << 15,
@@ -195,8 +195,8 @@ enum {
 };
 
 // tx/rx buffers are only accessible as uint16_t, not as bytes!
-inline uint16_t *usb_ep_tx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_TX; }
-inline uint16_t *usb_ep_rx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_RX; }
+inline volatile uint16_t *usb_ep_tx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_TX; }
+inline volatile uint16_t *usb_ep_rx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_RX; }
 
 // these are in units of bytes
 inline void		usb_ep_set_tx_count(int ep, uint16_t len) { USB_PMA.btable[ep].COUNT_TX = len & USB_PMA_COUNT_COUNT; }

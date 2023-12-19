@@ -73,14 +73,15 @@ static size_t read_buffer(uint8_t ep, uint8_t *buf, size_t sz) {
 		len = sz;
 	}
 
-	const uint16_t *src = usb_ep_rx_buf(ep);
+	const volatile uint16_t *src = usb_ep_rx_buf(ep);
 	for (size_t i = 0; 2 * i + 1 < len; ++i) {
-		buf[2 * i]	   = src[2 * i];
-		buf[2 * i + 1] = src[2 * i] >> 8;
+		uint16_t v = src[i];
+		buf[2 * i]	   = v;
+		buf[2 * i + 1] = v >> 8;
 	}
 
 	if (len & 1) {
-		buf[len - 1] = src[len - 1];
+		buf[len - 1] = src[len/2 + 1];
 	}
 
 	return len;
@@ -92,13 +93,13 @@ static size_t write_buffer(uint8_t ep, const uint8_t *buf, size_t len) {
 		len = 64;
 	}
 
-	uint16_t *dst = usb_ep_tx_buf(ep);
+	volatile uint16_t *dst = usb_ep_tx_buf(ep);
 	for (size_t i = 0; 2 * i + 1 < len; ++i) {
-		dst[2 * i] = read_le16(buf + 2 * i);
+		dst[i] = read_le16(buf + 2 * i);
 	}
 
 	if (len & 1) {
-		dst[len - 1] = buf[len - 1];
+		dst[len/2 + 1] = buf[len - 1];
 	}
 
 	usb_ep_set_tx_count(ep, len);
@@ -494,7 +495,7 @@ static void handle_ep0(void) {
 			break;
 		}
 
-		const uint16_t *src = usb_ep_rx_buf(0);
+		const volatile uint16_t *src = usb_ep_rx_buf(0);
 		_ctrl_req.req		= src[0];
 		_ctrl_req.val		= src[2];
 		_ctrl_req.idx		= src[4];
