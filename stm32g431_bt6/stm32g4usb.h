@@ -185,7 +185,7 @@ extern union {
 		volatile uint16_t ADDR_RX;
 		volatile uint16_t COUNT_RX;
 	} btable[8];		// located here by virtue of USB.BTABLE being zero
-	uint16_t buf[512];	// only accessible as uint16 or uint8
+	uint8_t buf[1024];	// only accessible as uint16 or uint8
 } USB_PMA;				// @ 0x40006000
 
 enum {
@@ -194,9 +194,9 @@ enum {
 	USB_PMA_COUNT_COUNT		= ((1UL << 10) - 1) << 0,
 };
 
-// tx/rx buffers are only accessible as uint16_t, not as bytes!
-inline volatile uint16_t *usb_ep_tx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_TX / 2; }
-inline volatile uint16_t *usb_ep_rx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_RX / 2; }
+// tx/rx buffers are only accessible as uint16_t or as bytes!
+inline volatile uint8_t *usb_ep_tx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_TX; }
+inline volatile uint8_t *usb_ep_rx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_RX; }
 
 // these are in units of bytes
 inline void		usb_ep_set_tx_count(int ep, uint16_t len) { USB_PMA.btable[ep].COUNT_TX = len & USB_PMA_COUNT_COUNT; }

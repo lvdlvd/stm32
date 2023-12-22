@@ -3,6 +3,7 @@
 //    proper suspend/wakeup detection
 //    string descriptors?
 //
+#include "cortex_m4.h"
 #include "usb.h"
 #include "stm32g4usb.h"
 
@@ -11,7 +12,7 @@
 extern size_t u2puts(const char *buf, size_t len);	// in main.c
 
 static enum usb_state_t _usb_state		 = USB_UNATTACHED;
-static enum usb_state_t _usb_state_saved = USB_UNATTACHED;	// when state is suspended, the state to return to on wakeup
+//static enum usb_state_t _usb_state_saved = USB_UNATTACHED;	// when state is suspended, the state to return to on wakeup
 
 enum usb_state_t usb_state() { return _usb_state; }
 
@@ -26,6 +27,7 @@ const char *usb_state_str(enum usb_state_t s) {
 }
 
 void usb_init() {
+
 	_usb_state = USB_UNATTACHED;
 
 	USB.CNTR   = USB_CNTR_FRES;	 // hold in reset, clear power down
@@ -50,7 +52,7 @@ void usb_init() {
 	usb_ep_set_rx_size(1, 64);
 
 	// bring out of reset and enable interrupts
-	USB.CNTR = USB_CNTR_CTRM | USB_CNTR_RESETM | USB_CNTR_WKUPM | USB_CNTR_SUSPM;
+	USB.CNTR = USB_CNTR_CTRM | USB_CNTR_RESETM; // | USB_CNTR_WKUPM | USB_CNTR_SUSPM;
 
 	USB.BCDR |= USB_BCDR_DPPU;	// connect DP pullup
 }
@@ -64,8 +66,6 @@ void usb_shutdown() {
 	_usb_state = USB_UNATTACHED;
 }
 
-static inline uint16_t read_le16(const uint8_t *src) { return ((uint16_t)(src[0])) | (((uint16_t)(src[1])) << 8); }
-
 // copy buf[:min(len,sz)] from the rx packet buffer of endpoint ep
 static size_t read_buffer(uint8_t ep, uint8_t *buf, size_t sz) {
 	uint16_t len = usb_ep_get_rx_count(ep);
@@ -73,17 +73,11 @@ static size_t read_buffer(uint8_t ep, uint8_t *buf, size_t sz) {
 		len = sz;
 	}
 
-	const volatile uint16_t *src = usb_ep_rx_buf(ep);
-	for (size_t i = 0; 2 * i + 1 < len; ++i) {
-		uint16_t v = src[i];
-		buf[2 * i]	   = v;
-		buf[2 * i + 1] = v >> 8;
+	const volatile uint8_t *src = usb_ep_rx_buf(ep);
+	for (size_t i = 0; i < len; ++i) {
+		buf[i] = src[i];
 	}
-
-	if (len & 1) {
-		buf[len - 1] = src[len/2 + 1];
-	}
-
+	__DMB();
 	return len;
 }
 
@@ -93,15 +87,11 @@ static size_t write_buffer(uint8_t ep, const uint8_t *buf, size_t len) {
 		len = 64;
 	}
 
-	volatile uint16_t *dst = usb_ep_tx_buf(ep);
-	for (size_t i = 0; 2 * i + 1 < len; ++i) {
-		dst[i] = read_le16(buf + 2 * i);
+	volatile uint8_t *dst = usb_ep_tx_buf(ep);
+	for (size_t i = 0; i < len; ++i) {
+		dst[i] = buf[i];
 	}
-
-	if (len & 1) {
-		dst[len/2 + 1] = buf[len - 1];
-	}
-
+	__DMB();
 	usb_ep_set_tx_count(ep, len);
 	return len;
 }
@@ -109,14 +99,43 @@ static size_t write_buffer(uint8_t ep, const uint8_t *buf, size_t len) {
 static void handle_ep0(void);  // below
 
 size_t usb_recv(uint8_t *buf, size_t sz) {
-	while ((USB.ISTR & USB_ISTR_CTR) != 0) {
+
+	uint16_t istr = USB.ISTR;
+
+	USB.ISTR &= ~(USB_ISTR_SOF | USB_ISTR_ESOF | USB_ISTR_ERR | USB_ISTR_PMAOVR | USB_ISTR_L1REQ);
+
+	// the other ISTR bits are r or rc_w0, meaning to clear them write ~bit to the register, avoid read-mod-write.
+
+	if (istr & USB_ISTR_RESET) {
+
+		cbprintf(u2puts, " reset\n");
+
+		USB.ISTR &= ~(USB_ISTR_RESET | USB_ISTR_WKUP | USB_ISTR_SUSP);
+		USB.CNTR &= ~(USB_CNTR_RESUME | USB_CNTR_FSUSP | USB_CNTR_LPMODE | USB_CNTR_PDWN | USB_CNTR_FRES);
+
+		usb_ep_config(0, USB_EP_TYPE_CONTROL, 0);
+		usb_ep_set_stat_tx(0, USB_EP_STAT_STALL);  // only setup will succeed
+		usb_ep_set_stat_rx(0, USB_EP_STAT_STALL);
+
+		for (int i = 1; i < 8; ++i) {
+			usb_ep_reset(i);
+		}
+
+		usb_daddr_set_add(0);
+		USB.DADDR |= USB_DADDR_EF;
+
+		_usb_state = USB_DEFAULT;
+		return 0;
+	}
+
+	if ((istr & USB_ISTR_CTR) != 0) {
 		uint8_t ep = usb_istr_get_ep_id();
 
 		cbprintf(u2puts, " ctr %d\n", ep);
 
 		if (ep == 0) {
 			handle_ep0();
-			continue;
+			return 0;
 		}
 
 		// assert (ep == 1)
@@ -137,78 +156,6 @@ size_t usb_recv(uint8_t *buf, size_t sz) {
 			return len;
 		}
 	}
-
-	// the other ISTR bits are r or rc_w0, meaning to clear them write ~bit to the register, avoid read-mod-write.
-
-	if (USB.ISTR & USB_ISTR_RESET) {
-		USB.ISTR = ~USB_ISTR_RESET;
-
-		cbprintf(u2puts, " reset");
-
-		USB.CNTR &= ~(USB_CNTR_RESUME | USB_CNTR_FSUSP | USB_CNTR_LPMODE | USB_CNTR_PDWN | USB_CNTR_FRES);
-
-		usb_ep_config(0, USB_EP_TYPE_CONTROL, 0);
-		usb_ep_set_stat_tx(0, USB_EP_STAT_STALL);
-		usb_ep_set_stat_rx(0, USB_EP_STAT_STALL);  // only setup will succeed
-
-		for (int i = 1; i < 8; ++i) {
-			usb_ep_reset(i);
-		}
-
-		usb_daddr_set_add(0);
-		USB.DADDR |= USB_DADDR_EF;
-
-		_usb_state = USB_DEFAULT;
-	}
-
-	if (USB.ISTR & USB_ISTR_PMAOVR) {
-		USB.ISTR = ~USB_ISTR_PMAOVR;
-		cbprintf(u2puts, " pmaovr");
-	}
-
-	if (USB.ISTR & USB_ISTR_ERR) {
-		USB.ISTR = ~USB_ISTR_ERR;
-		cbprintf(u2puts, " err");
-	}
-
-	// USB2.0 sec 9.1.1.6: When suspended, the USB device maintains any internal
-	// status, including its address and configuration.
-	// The device must draw less than 2.5mA from the bus in this configuration.
-	// TODO: facility to sleep/wkup the entire G4xx?
-
-	if (USB.ISTR & USB_ISTR_WKUP) {
-		USB.CNTR &= ~USB_CNTR_LPMODE;
-		USB.CNTR &= ~USB_CNTR_FSUSP;
-
-		cbprintf(u2puts, " wkup");
-
-		// // According to RM0440 Rev 7 45.5.5, table 416, the RXDP line
-		// // must be checked for spurious wakeups through noise on the bus.
-		// if ((USB.FNR & (USB_FNR_RXDP|USB_FNR_RXDM)) != USB_FNR_RXDM) {
-		//     cbprintf(u2puts, "spurious  fnr %u lsof %u D%s%s%s\n",  usb_fnr_get_fn(), usb_fnr_get_lsof(),
-		// ((USB.FNR&USB_FNR_RXDP) ? "P" : "_"),
-		// ((USB.FNR&USB_FNR_RXDM) ? "M":"_"),
-		// ((USB.FNR&USB_FNR_LCK)  ? " LCK" : ""));
-		// }
-
-		USB.ISTR = ~USB_ISTR_WKUP;
-
-		_usb_state = _usb_state_saved;
-	}
-
-	if (USB.ISTR & USB_ISTR_SUSP) {
-		USB.CNTR |= USB_CNTR_FSUSP;
-		USB.ISTR = ~USB_ISTR_SUSP;
-
-		_usb_state_saved = _usb_state;
-		_usb_state		 = USB_SUSPENDED;
-
-		USB.CNTR |= USB_CNTR_LPMODE;  // should be done /after FSUSP (todo simultaneous?)
-
-		cbprintf(u2puts, " susp");
-	}
-
-	USB.ISTR = ~(USB_ISTR_L1REQ | USB_ISTR_SOF | USB_ISTR_ESOF);
 
 	return 0;
 }
@@ -479,9 +426,12 @@ static int handle_get_request() {
 		}
 		break;
 	}
+				cbprintf(u2puts, "get req len %d\n", _ctrl_req.len);
 
 	return write_buffer(0, data, _ctrl_req.len) == _ctrl_req.len;
 }
+
+static inline uint16_t read_le16(const volatile uint8_t* src) { return ((uint16_t)(src[0])) | (((uint16_t)(src[1])) << 8); }
 
 static void handle_ep0(void) {
 	switch (USB.EPR[0] & (USB_EPRx_CTR_RX | USB_EPRx_SETUP | USB_EPRx_CTR_TX)) {
@@ -496,13 +446,18 @@ static void handle_ep0(void) {
 			break;
 		}
 
-		const volatile uint16_t *src = usb_ep_rx_buf(0);
-		_ctrl_req.req		= src[0];
-		_ctrl_req.val		= src[2];
-		_ctrl_req.idx		= src[4];
-		_ctrl_req.len		= src[6];
+		volatile uint8_t* b = usb_ep_rx_buf(0);
+		_ctrl_req.req = read_le16(b);
+		_ctrl_req.val = read_le16(b+2);
+		_ctrl_req.idx = read_le16(b+4);
+		_ctrl_req.len = read_le16(b+6);
 
+//		read_buffer(0, (uint8_t*)&_ctrl_req, sizeof _ctrl_req);
 		usb_ep_clr_ctr_rx(0);
+
+		cbprintf(u2puts, "setup %x %x %x %x\n", _ctrl_req.req, _ctrl_req.val, _ctrl_req.idx, _ctrl_req.len);
+
+
 
 		// if non-zero length request and direction is OUT
 		// there's no request we can handle so bail out straightaway
@@ -514,11 +469,15 @@ static void handle_ep0(void) {
 			if (!handle_set_request()) {
 				break;
 			}
+			cbprintf(u2puts, "handled set req\n");
+
 			usb_ep_set_tx_count(0, 0);	// ZLP status-in reply
 		} else {
 			if (!handle_get_request()) {  // sets up reply buffer
 				break;
 			}
+			cbprintf(u2puts, "handled get req\n");
+
 		}
 
 		usb_ep_set_stat_tx(0, USB_EP_STAT_VALID);
