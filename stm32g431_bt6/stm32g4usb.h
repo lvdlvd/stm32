@@ -195,8 +195,8 @@ enum {
 };
 
 // tx/rx buffers are only accessible as uint16_t, not as bytes!
-inline volatile uint16_t *usb_ep_tx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_TX; }
-inline volatile uint16_t *usb_ep_rx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_RX; }
+inline volatile uint16_t *usb_ep_tx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_TX / 2; }
+inline volatile uint16_t *usb_ep_rx_buf(int ep) { return USB_PMA.buf + USB_PMA.btable[ep].ADDR_RX / 2; }
 
 // these are in units of bytes
 inline void		usb_ep_set_tx_count(int ep, uint16_t len) { USB_PMA.btable[ep].COUNT_TX = len & USB_PMA_COUNT_COUNT; }

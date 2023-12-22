@@ -39,8 +39,8 @@ void usb_init() {
 		usb_ep_reset(i);
 	}
 
-	// 512 bytes in USB_PMA
-	// btable: 8 * 4 * 2 = 64 bytes, in ADDR_xX units
+	// 1024 bytes in USB_PMA
+	// btable: 8 * 4 * 2 = 64 bytes
 	USB_PMA.btable[0].ADDR_TX = 1 * 64;	 // control endpoint 0x00/0x80
 	USB_PMA.btable[0].ADDR_RX = 2 * 64;
 	usb_ep_set_rx_size(0, 64);
@@ -281,8 +281,9 @@ static const uint8_t _configDescriptor[] = {
 
 enum {
 	REQ_TYPE_TX = 1 << 7,  // bit 7 direction: 1: device->host
-						   //	REQ_TYPE_VENDOR 		= 1<<6, // bits 6..5 : type
-						   //	REQ_TYPE_CLASS 			= 1<<5, //  00 = standard, 11 is reserved
+
+   	//	REQ_TYPE_VENDOR 		= 1<<6, // bits 6..5 : type
+   	//	REQ_TYPE_CLASS 			= 1<<5, //  00 = standard, 11 is reserved
 
 	//	REQ_TYPE_DEVICE 		=  0x00,
 	REQ_TYPE_INTERFACE = 0x01,
@@ -294,9 +295,9 @@ enum {
 	REQ_CLR_FEATURE = (1 << 8),				   // 1 remote wakeup-enable, 2: test mode (high-speed only)
 	REQ_SET_FEATURE = (3 << 8),
 	REQ_SET_ADDRESS = (5 << 8),	 // device only
-	REQ_GET_DESCRIPTOR =
-			(6 << 8) | REQ_TYPE_TX,	 // device only
-									 //	REQ_SET_DESCRIPTOR 		= (7<<8),                // device only       // we don't support
+	REQ_GET_DESCRIPTOR = (6 << 8) | REQ_TYPE_TX,	 // device only
+
+	 //	REQ_SET_DESCRIPTOR 		= (7<<8),                // device only       // we don't support
 	REQ_GET_CONFIGURATION = (8 << 8) | REQ_TYPE_TX,	 // device only       // return state == USB_CONFIGURED ? 1 : 0
 	REQ_SET_CONFIGURATION = (9 << 8),  // device only       // 0-> state to ADDRESS,  1 -> state to CONFIGURED (and configure)
 	REQ_GET_INTERFACE	  = (10 << 8) | REQ_TYPE_TX | REQ_TYPE_INTERFACE,  // interface only
