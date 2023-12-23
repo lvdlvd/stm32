@@ -3,7 +3,6 @@
 //    proper suspend/wakeup detection
 //    string descriptors?
 //
-#include "cortex_m4.h"
 #include "usb.h"
 #include "stm32g4usb.h"
 
