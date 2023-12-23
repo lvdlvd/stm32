@@ -77,7 +77,7 @@ static size_t read_buffer(uint8_t ep, uint8_t *buf, size_t sz) {
 	for (size_t i = 0; i < len; ++i) {
 		buf[i] = src[i];
 	}
-	__DMB();
+
 	return len;
 }
 
@@ -91,7 +91,7 @@ static size_t write_buffer(uint8_t ep, const uint8_t *buf, size_t len) {
 	for (size_t i = 0; i < len; ++i) {
 		dst[i] = buf[i];
 	}
-	__DMB();
+
 	usb_ep_set_tx_count(ep, len);
 	return len;
 }
@@ -431,8 +431,6 @@ static int handle_get_request() {
 	return write_buffer(0, data, _ctrl_req.len) == _ctrl_req.len;
 }
 
-static inline uint16_t read_le16(const volatile uint8_t* src) { return ((uint16_t)(src[0])) | (((uint16_t)(src[1])) << 8); }
-
 static void handle_ep0(void) {
 	switch (USB.EPR[0] & (USB_EPRx_CTR_RX | USB_EPRx_SETUP | USB_EPRx_CTR_TX)) {
 	case USB_EPRx_CTR_RX | USB_EPRx_SETUP:
@@ -446,13 +444,8 @@ static void handle_ep0(void) {
 			break;
 		}
 
-		volatile uint8_t* b = usb_ep_rx_buf(0);
-		_ctrl_req.req = read_le16(b);
-		_ctrl_req.val = read_le16(b+2);
-		_ctrl_req.idx = read_le16(b+4);
-		_ctrl_req.len = read_le16(b+6);
-
-//		read_buffer(0, (uint8_t*)&_ctrl_req, sizeof _ctrl_req);
+		// this relies on the platform being little-endian
+		read_buffer(0, (uint8_t*)&_ctrl_req, sizeof _ctrl_req);
 		usb_ep_clr_ctr_rx(0);
 
 		cbprintf(u2puts, "setup %x %x %x %x\n", _ctrl_req.req, _ctrl_req.val, _ctrl_req.idx, _ctrl_req.len);
