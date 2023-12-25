@@ -28395,6 +28395,12 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitOffset>14</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
+                  <field>
+                     <name>RESVZ</name>
+                     <description>force 32 bit width</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
                </fields>
             </register>
             <register>
@@ -28478,6 +28484,13 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitOffset>14</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
+                  <field>
+                     <name>RESVZ</name>
+                     <description>force 32 bit width</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+
                </fields>
             </register>
             <register>
@@ -28561,6 +28574,14 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitOffset>14</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
+
+                  <field>
+                     <name>RESVZ</name>
+                     <description>force 32 bit width</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+
                </fields>
             </register>
             <register>
@@ -28644,6 +28665,14 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitOffset>14</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
+
+                  <field>
+                     <name>RESVZ</name>
+                     <description>force 32 bit width</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+            
                </fields>
             </register>
             <register>
@@ -28727,6 +28756,14 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitOffset>14</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
+
+                  <field>
+                     <name>RESVZ</name>
+                     <description>force 32 bit width</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+
                </fields>
             </register>
             <register>
@@ -28810,6 +28847,14 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitOffset>14</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
+
+                  <field>
+                     <name>RESVZ</name>
+                     <description>force 32 bit width</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+
                </fields>
             </register>
             <register>
@@ -28893,6 +28938,14 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitOffset>14</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
+
+                  <field>
+                     <name>RESVZ</name>
+                     <description>force 32 bit width</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+
                </fields>
             </register>
             <register>
@@ -28976,6 +29029,14 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitOffset>14</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
+
+                  <field>
+                     <name>RESVZ</name>
+                     <description>force 32 bit width</description>
+                     <bitOffset>16</bitOffset>
+                     <bitWidth>16</bitWidth>
+                  </field>
+
                </fields>
             </register>
             <register>
@@ -28991,7 +29052,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <name>NDT</name>
                      <description>Number of data items to               transfer</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>32</bitWidth>
                   </field>
                </fields>
             </register>
@@ -29008,7 +29069,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <name>NDT</name>
                      <description>Number of data items to               transfer</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>32</bitWidth>
                   </field>
                </fields>
             </register>
@@ -29025,7 +29086,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <name>NDT</name>
                      <description>Number of data items to               transfer</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>32</bitWidth>
                   </field>
                </fields>
             </register>
@@ -29042,7 +29103,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <name>NDT</name>
                      <description>Number of data items to               transfer</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>32</bitWidth>
                   </field>
                </fields>
             </register>
@@ -29059,7 +29120,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <name>NDT</name>
                      <description>Number of data items to               transfer</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>32</bitWidth>
                   </field>
                </fields>
             </register>
@@ -29076,7 +29137,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <name>NDT</name>
                      <description>Number of data items to               transfer</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>32</bitWidth>
                   </field>
                </fields>
             </register>
@@ -29093,7 +29154,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <name>NDT</name>
                      <description>Number of data items to               transfer</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>32</bitWidth>
                   </field>
                </fields>
             </register>
@@ -29110,7 +29171,7 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <name>NDT</name>
                      <description>Number of data items to               transfer</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>32</bitWidth>
                   </field>
                </fields>
             </register>
@@ -39478,8 +39539,8 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitWidth>1</bitWidth>
                   </field>
                   <field>
-                     <name>UNALIGN_TRP</name>
-                     <description>UNALIGN_TRP</description>
+                     <name>UNALIGN__TRP</name>
+                     <description>UNALIGN_ TRP</description>
                      <bitOffset>3</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
@@ -39679,12 +39740,6 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                   <field>
                      <name>IACCVIOL</name>
                      <description>Instruction access violation               flag</description>
-                     <bitOffset>0</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DACCVIOL</name>
-                     <description>Data access violation               flag</description>
                      <bitOffset>1</bitOffset>
                      <bitWidth>1</bitWidth>
                   </field>
