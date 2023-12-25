@@ -1657,7 +1657,7 @@ Per type differences
                      <name>DEV_ID</name>
                      <description>Device Identifier</description>
                      <bitOffset>0</bitOffset>
-                     <bitWidth>16</bitWidth>
+                     <bitWidth>12</bitWidth>
                   </field>
                   <field>
                      <name>REV_ID</name>
