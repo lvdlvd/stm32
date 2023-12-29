@@ -8,10 +8,6 @@
 #include "cortex_m4.h"
 #include "stm32g4usb.h"
 
-// for debug print statements
-#include "printf.h"
-extern size_t u2puts(const char *buf, size_t len);	// in main.c
-
 static enum usb_state_t _usb_state		 = USB_UNATTACHED;
 //static enum usb_state_t _usb_state_saved = USB_UNATTACHED;	// when state is suspended, the state to return to on wakeup
 
@@ -38,10 +34,6 @@ void usb_init() {
 	USB.LPMCSR = 0;				 // no low-power support
 	USB.BCDR   = 0;				 // no battery charging detector support
 
-	for (size_t i = 0; i <sizeof (USB_PMA.buf) / sizeof(USB_PMA.buf[0]); ++i){
-		USB_PMA.buf[i] = 0;
-	}		
-
 	for (int i = 0; i < 8; ++i) {
 		usb_ep_reset(i);
 	}
@@ -58,13 +50,7 @@ void usb_init() {
 
 	// bring out of reset and enable interrupts
 	USB.CNTR = USB_CNTR_CTRM | USB_CNTR_RESETM; // | USB_CNTR_WKUPM | USB_CNTR_SUSPM;
-
 	USB.BCDR |= USB_BCDR_DPPU;	// connect DP pullup
-
-	for (int ep = 0; ep < 8; ++ep) {
-		cbprintf(u2puts, "ep %i tx: %x[%x] rx:%x[%x]\n", ep, USB_PMA.btable[ep].ADDR_TX, USB_PMA.btable[ep].COUNT_TX, USB_PMA.btable[ep].ADDR_RX, USB_PMA.btable[ep].COUNT_RX);
-	}
-
 }
 
 void usb_shutdown() {
@@ -91,7 +77,6 @@ static size_t read_buffer(uint8_t ep, uint8_t *buf, size_t sz) {
 	 if (len % 2 == 1) {
         ((volatile uint8_t *)dst)[len - 1] = ((const volatile uint8_t *)src)[len - 1];
     }
-	__DSB();
 	return len;
 }
 
@@ -111,7 +96,6 @@ static size_t write_buffer(uint8_t ep, const uint8_t *buf, size_t len) {
     }
 
 	usb_ep_set_tx_count(ep, len);
-	__DSB();
 	return len;
 }
 
@@ -126,8 +110,6 @@ size_t usb_recv(uint8_t *buf, size_t sz) {
 	// the other ISTR bits are r or rc_w0, meaning to clear them write ~bit to the register, avoid read-mod-write.
 
 	if (istr & USB_ISTR_RESET) {
-
-		cbprintf(u2puts, " reset\n");
 
 		USB.ISTR &= ~(USB_ISTR_RESET | USB_ISTR_WKUP | USB_ISTR_SUSP);
 		USB.CNTR &= ~(USB_CNTR_RESUME | USB_CNTR_FSUSP | USB_CNTR_LPMODE | USB_CNTR_PDWN | USB_CNTR_FRES);
@@ -149,8 +131,6 @@ size_t usb_recv(uint8_t *buf, size_t sz) {
 
 	if ((istr & USB_ISTR_CTR) != 0) {
 		uint8_t ep = usb_istr_get_ep_id();
-
-		cbprintf(u2puts, " ctr %d\n", ep);
 
 		if (ep == 0) {
 			handle_ep0();
@@ -445,7 +425,6 @@ static int handle_get_request() {
 		}
 		break;
 	}
-				cbprintf(u2puts, "get req len %d\n", _ctrl_req.len);
 
 	return write_buffer(0, data, _ctrl_req.len) == _ctrl_req.len;
 }
@@ -459,17 +438,12 @@ static void handle_ep0(void) {
 		// assert dir == 1
 
 		if (usb_ep_get_rx_count(0) != 8) {
-			cbprintf(u2puts, " invalid setup packet %d\n", usb_ep_get_rx_count(0));
 			break;
 		}
 
 		// this relies on the platform being little-endian
 		read_buffer(0, (uint8_t*)&_ctrl_req, sizeof _ctrl_req);
 		usb_ep_clr_ctr_rx(0);
-
-		cbprintf(u2puts, "setup %04x %04x %04x %04x\n", _ctrl_req.req, _ctrl_req.val, _ctrl_req.idx, _ctrl_req.len);
-
-
 
 		// if non-zero length request and direction is OUT
 		// there's no request we can handle so bail out straightaway
@@ -481,15 +455,11 @@ static void handle_ep0(void) {
 			if (!handle_set_request()) {
 				break;
 			}
-			cbprintf(u2puts, "handled set req\n");
-
 			usb_ep_set_tx_count(0, 0);	// ZLP status-in reply
 		} else {
 			if (!handle_get_request()) {  // sets up reply buffer
 				break;
 			}
-			cbprintf(u2puts, "handled get req\n");
-
 		}
 
 		usb_ep_set_stat_tx(0, USB_EP_STAT_VALID);
