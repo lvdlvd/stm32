@@ -441,8 +441,14 @@ static void handle_ep0(void) {
 			break;
 		}
 
-		// this relies on the platform being little-endian
-		read_buffer(0, (uint8_t*)&_ctrl_req, sizeof _ctrl_req);
+		// this copying relies on the platform being little-endian, 
+		// like the native transfer in usb
+		const volatile uint16_t *src = usb_ep_rx_buf(0);
+		_ctrl_req.req = src[0];
+		_ctrl_req.val = src[1];
+		_ctrl_req.idx = src[2];
+		_ctrl_req.len = src[3];
+
 		usb_ep_clr_ctr_rx(0);
 
 		// if non-zero length request and direction is OUT
