@@ -4,6 +4,8 @@
 //    string descriptors?
 //
 #include "usb.h"
+
+#include "cortex_m4.h"
 #include "stm32g4usb.h"
 
 // for debug print statements
@@ -36,6 +38,10 @@ void usb_init() {
 	USB.LPMCSR = 0;				 // no low-power support
 	USB.BCDR   = 0;				 // no battery charging detector support
 
+	for (size_t i = 0; i <sizeof (USB_PMA.buf) / sizeof(USB_PMA.buf[0]); ++i){
+		USB_PMA.buf[i] = 0;
+	}		
+
 	for (int i = 0; i < 8; ++i) {
 		usb_ep_reset(i);
 	}
@@ -54,6 +60,11 @@ void usb_init() {
 	USB.CNTR = USB_CNTR_CTRM | USB_CNTR_RESETM; // | USB_CNTR_WKUPM | USB_CNTR_SUSPM;
 
 	USB.BCDR |= USB_BCDR_DPPU;	// connect DP pullup
+
+	for (int ep = 0; ep < 8; ++ep) {
+		cbprintf(u2puts, "ep %i tx: %x[%x] rx:%x[%x]\n", ep, USB_PMA.btable[ep].ADDR_TX, USB_PMA.btable[ep].COUNT_TX, USB_PMA.btable[ep].ADDR_RX, USB_PMA.btable[ep].COUNT_RX);
+	}
+
 }
 
 void usb_shutdown() {
@@ -72,11 +83,15 @@ static size_t read_buffer(uint8_t ep, uint8_t *buf, size_t sz) {
 		len = sz;
 	}
 
-	const volatile uint8_t *src = usb_ep_rx_buf(ep);
-	for (size_t i = 0; i < len; ++i) {
-		buf[i] = src[i];
+	const volatile uint16_t *src = usb_ep_rx_buf(ep);
+	volatile uint16_t *dst = (volatile uint16_t*)buf;
+	for (size_t i = 0; i < len/2; ++i) {
+		dst[i] = src[i];
 	}
-
+	 if (len % 2 == 1) {
+        ((volatile uint8_t *)dst)[len - 1] = ((const volatile uint8_t *)src)[len - 1];
+    }
+	__DSB();
 	return len;
 }
 
@@ -86,12 +101,17 @@ static size_t write_buffer(uint8_t ep, const uint8_t *buf, size_t len) {
 		len = 64;
 	}
 
-	volatile uint8_t *dst = usb_ep_tx_buf(ep);
-	for (size_t i = 0; i < len; ++i) {
-		dst[i] = buf[i];
+	const volatile uint16_t *src = (const volatile uint16_t*)buf;
+	volatile uint16_t *dst = usb_ep_tx_buf(ep);
+	for (size_t i = 0; i < len/2; ++i) {
+		dst[i] = src[i];
 	}
+	 if (len % 2 == 1) {
+        ((volatile uint8_t *)dst)[len - 1] = ((const volatile uint8_t *)src)[len - 1];
+    }
 
 	usb_ep_set_tx_count(ep, len);
+	__DSB();
 	return len;
 }
 
@@ -447,7 +467,7 @@ static void handle_ep0(void) {
 		read_buffer(0, (uint8_t*)&_ctrl_req, sizeof _ctrl_req);
 		usb_ep_clr_ctr_rx(0);
 
-		cbprintf(u2puts, "setup %x %x %x %x\n", _ctrl_req.req, _ctrl_req.val, _ctrl_req.idx, _ctrl_req.len);
+		cbprintf(u2puts, "setup %04x %04x %04x %04x\n", _ctrl_req.req, _ctrl_req.val, _ctrl_req.idx, _ctrl_req.len);
 
 
 
