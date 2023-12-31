@@ -2,7 +2,7 @@
 extern inline void usart_wait(struct USART_Type *usart);
 
 void usart_init(struct USART_Type *usart, int baud) {
-	usart->CR1 = 0;
+	usart->CR1 = 0;// USART_CR1_M0|USART_CR1_PCE; // we set Even parity, for compatibility with stm system bootloader.;
 	usart->CR2 = 0;
 	usart->CR3 = 0;
 

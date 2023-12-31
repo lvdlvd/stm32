@@ -127,7 +127,7 @@ void DMA2_CH8_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void Cordic_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void FMAC_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 
-__attribute__((section(".isr_vector"))) void (*vector_table[])(void) = {
+__attribute__((section(".isr_vector"))) void (*const vector_table[])(void) = {
 		_estack,
 		Reset_Handler,
 		NonMaskableInt_Handler,

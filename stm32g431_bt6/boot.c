@@ -23,8 +23,9 @@ static inline void systemInit(void) {
 	RCC.CICR = RCC.CIFR;
 }
 
-enum {
-	HSE_RDY_TIMEOUT = 5000,
+enum { 
+	HSE_FREQ_MHZ 	= 24,     // nucleo board: 24MHz, canard: 8MHz
+	HSE_RDY_TIMEOUT = 5000, 
 };
 
 static int setSysClockTo144MHz(void) {
@@ -61,7 +62,7 @@ static int setSysClockTo144MHz(void) {
 		rcc_pllcfgr_set_pllm(&RCC, 1);	  // 0..15       : vco_in = HSI / (1+m)  2..16MHz   16/2 = 8MHz
 	} else {
 		rcc_pllcfgr_set_pllsrc(&RCC, 3);  // select 2:HSE source (24MHz)
-		rcc_pllcfgr_set_pllm(&RCC, 2);	  // 0..15       : vco_in = HSE / (1+m)  2..16MHz    24/3 = 8MHz
+		rcc_pllcfgr_set_pllm(&RCC, (HSE_FREQ_MHZ/8)-1);	  // 0..15       : vco_in = HSE / (1+m)  2..16MHz    24/3 = 8MHz
 	}
 
 	rcc_pllcfgr_set_plln(&RCC, 36);	 // 8...127     : vco_out = vco_in * n = 96...344MHz    8 * 36 = 288MHz

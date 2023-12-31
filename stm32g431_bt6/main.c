@@ -55,7 +55,7 @@ void USB_LP_Handler(void) {
 	uint64_t now = cycleCount();
 	led0_toggle();
 	static int i = 0;
-	cbprintf(u2puts, "%lld IRQ %i: %s\n", now / 72, i++, usb_state_str(usb_state()));
+	cbprintf(u2puts, "%lld IRQ %i: %s\n", now / C_US, i++, usb_state_str(usb_state()));
 	uint8_t buf[64];
 	size_t	len = usb_recv(buf, sizeof buf);
 	if (len > 0) {
@@ -93,8 +93,12 @@ void main(void) {
 		gpioConfig(p->pins, p->mode);
 	}
 
-	usart_init(&USART2, 921600);
+        ringbuffer_clear(&usart2tx);
+	usart_init(&USART2, 115200);
 	NVIC_EnableIRQ(USART2_IRQn);
+
+ 	delay(100*1000); // be nice to stmloader switching serial port settings
+
 
 	cbprintf(u2puts, "SWREV:%s\n", __REVISION__);
 	cbprintf(u2puts, "CPUID:%08lx\n", SCB.CPUID);
