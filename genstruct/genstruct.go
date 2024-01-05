@@ -68,7 +68,8 @@ type Peripheral struct {
 	AddressBlockSize number        `xml:"addressBlock>Size"`
 	Interrupts       []*Interrupt  `xml:"interrupt"`
 	Registers        []*Register   `xml:"registers>register"`
-	Extends          []*Peripheral `xml:-` // other peripheral types  that
+	Extends          []*Peripheral `xml:-` // list of base types (registers and bits are strict subset)
+	Others           []*Peripheral `xml:-` // list of types that have this one as 'DerivedFrom' value
 }
 
 func (p *Peripheral) RegisterByName(s string) *Register {
@@ -219,6 +220,8 @@ func cleanws(s *string) { *s = strings.Join(strings.Fields(*s), " ") }
 
 var (
 	fDebug = flag.Bool("d", false, "dump parsed device struct")
+	fTempl = flag.String("t", "", "name of template file")
+	fList  = flag.String("i", "", "if not empty, only include devices named in this file")
 )
 
 func main() {
@@ -227,19 +230,40 @@ func main() {
 	log.SetPrefix("genstruct: ")
 	flag.Parse()
 
-	if len(flag.Args()) != 2 {
-		log.Fatalf("Usage: %s path/to/lang.tmpl path/to/stm32xxxx.svd", os.Args[0])
+	if len(flag.Args()) != 1 {
+		log.Fatalf("Usage: %s [-d] [-i incl.lst] [-t path/to/lang.tmpl] path/to/stm32xxxx.svd", os.Args[0])
 	}
 
-	tmpl, err := template.New(filepath.Base(flag.Arg(0))).Funcs(tmplfuncs).ParseFiles(flag.Arg(0))
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("template file:", tmpl.Name())
+	var (
+		tmpl *template.Template
+		err  error
+		incl map[string]bool
+	)
 
-	f, err := os.Open(flag.Arg(1))
+	if *fList != "" {
+		buf, err := os.ReadFile(*fList)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		incl = map[string]bool{}
+		for _, v := range strings.Fields(string(buf)) {
+			incl[v] = true
+		}
+	}
+
+	if *fTempl == "" {
+		tmpl = template.Must(template.New("list").Funcs(tmplfuncs).Parse(listTmpl))
+	} else {
+		tmpl, err = template.New(filepath.Base(*fTempl)).Funcs(tmplfuncs).ParseFiles(*fTempl)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("template file:", tmpl.Name())
+	}
+
+	f, err := os.Open(flag.Arg(0))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	dname, fname := filepath.Split(f.Name())
 	basename := strings.ToLower(strings.TrimSuffix(fname, filepath.Ext(fname)))
@@ -255,6 +279,16 @@ func main() {
 
 	if device.AddressUnitBits != 8 || device.Width != 32 {
 		log.Fatal("can only work on assuming AddressUnitBits = 8, got %d and device.Width = 32, got %d", device.AddressUnitBits, device.Width)
+	}
+
+	if incl != nil {
+		vv := device.Peripherals[:0]
+		for _, v := range device.Peripherals {
+			if incl[v.Name] {
+				vv = append(vv, v)
+			}
+		}
+		device.Peripherals = vv
 	}
 
 	for _, v := range device.Peripherals {
@@ -372,6 +406,7 @@ func main() {
 	for _, v := range device.Peripherals {
 		if vv := device.PeripheralType(v.Name); vv != v {
 			v.DerivedFrom = vv.Name
+			vv.Others = append(vv.Others, v)
 			v.Registers = nil
 		} else {
 			v.FillRegisters()
@@ -415,3 +450,12 @@ func isSuperset(big, small *Peripheral) bool {
 func nameTemplate(s string) string {
 	return strings.Join(strings.FieldsFunc(s+" ", unicode.IsDigit), "X")
 }
+
+var listTmpl = `
+{{range .Peripherals}}
+{{- if .DerivedFrom}}
+{{- else}}
+{{.Name}}{{range .Others}} {{.Name}}{{end}}
+{{- end}}
+{{- end}}
+`
