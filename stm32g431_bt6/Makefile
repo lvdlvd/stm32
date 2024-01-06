@@ -43,6 +43,15 @@ $(OBJS): Makefile
 flash: main.hex
 	st-flash --connect-under-reset --reset --format ihex write $<
 
+
+flash2: main.elf
+	openocd \
+		-f interface/stlink.cfg \
+		-f target/stm32g4x.cfg \
+		-f openocd.cfg
+
+
+
 debug: main.elf
 	st-util &
 	$(PREFIX)gdb $^

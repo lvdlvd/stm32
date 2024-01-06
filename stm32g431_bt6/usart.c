@@ -1,14 +1,12 @@
 #include "usart.h"
+#include "clock.h"
 extern inline void usart_wait(struct USART_Type *usart);
 
 void usart_init(struct USART_Type *usart, int baud) {
 	usart->CR1 = 0;// USART_CR1_M0|USART_CR1_PCE; // we set Even parity, for compatibility with stm system bootloader.;
 	usart->CR2 = 0;
 	usart->CR3 = 0;
-
-	uint32_t clk = 144000000;
-
-	usart->BRR = clk / baud;
+	usart->BRR = (CLOCKSPEED_HZ + baud/2) / baud;
 	usart->CR1 |= USART_CR1_UE | USART_CR1_TE;
 }
 

@@ -2,7 +2,7 @@
 #include "stm32g4xx.h"
 
 extern void main(void) __attribute__((noreturn));	// in main.c
-extern void (*vector_table[])(void);				// in vector.c
+extern void (*const vector_table[])(void);				// in vector.c
 extern char _sidata, _sdata, _edata, _sbss, _ebss;	// provided by linker script
 
 static inline void systemInit(void) {
@@ -31,8 +31,7 @@ enum {
 static int setSysClockTo144MHz(void) {
 	RCC.CR |= RCC_CR_HSEON;
 
-	//	for (int i = 0; i < HSE_RDY_TIMEOUT; i++)
-	for (;;) {
+	for (int i = 0; i < HSE_RDY_TIMEOUT; i++) {
 		if (RCC.CR & RCC_CR_HSERDY) {
 			break;
 		}
@@ -61,7 +60,7 @@ static int setSysClockTo144MHz(void) {
 		rcc_pllcfgr_set_pllsrc(&RCC, 2);  // select 2:HSI source (16MHz)
 		rcc_pllcfgr_set_pllm(&RCC, 1);	  // 0..15       : vco_in = HSI / (1+m)  2..16MHz   16/2 = 8MHz
 	} else {
-		rcc_pllcfgr_set_pllsrc(&RCC, 3);  // select 2:HSE source (24MHz)
+		rcc_pllcfgr_set_pllsrc(&RCC, 3);  // select 2:HSE source (8 or 24MHz)
 		rcc_pllcfgr_set_pllm(&RCC, (HSE_FREQ_MHZ/8)-1);	  // 0..15       : vco_in = HSE / (1+m)  2..16MHz    24/3 = 8MHz
 	}
 

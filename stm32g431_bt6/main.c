@@ -12,6 +12,7 @@
 
 enum {
 	LED0_PIN	  = PA5,  // 64 pin nucleo  //PB8 on 32 pin mini nucleo
+//	LED0_PIN = PC3,
 	USART2_TX_PIN = PA2,
 };
 
@@ -87,13 +88,13 @@ void main(void) {
 	}
 
 	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM3EN | RCC_APB1ENR1_USBEN;
-	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
+	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN;
 
 	for (const struct gpio_config_t *p = pin_cfgs; p->pins; ++p) {
 		gpioConfig(p->pins, p->mode);
 	}
 
-        ringbuffer_clear(&usart2tx);
+    ringbuffer_clear(&usart2tx);
 	usart_init(&USART2, 115200);
 	NVIC_EnableIRQ(USART2_IRQn);
 
