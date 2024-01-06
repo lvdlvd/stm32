@@ -6,6 +6,7 @@
 #include "nvic.h"
 #include "printf.h"
 #include "usart.h"
+#include "usb.h"
 
 enum {
 //	LED0_PIN	  = PA5,  // 64 pin nucleo  //PB8 on 32 pin mini nucleo
@@ -31,6 +32,7 @@ struct {
 } irqprios[] = {
     {SysTick_IRQn, PRIO(0, 0)},
     {USART2_IRQn,  PRIO(1, 0)},
+    {USB_LP_IRQn,  PRIO(2, 0)},
     {TIM3_IRQn,    PRIO(3, 0)},
     {None_IRQn, 0xff},
 };
@@ -45,7 +47,8 @@ extern uint32_t UNIQUE_DEVICE_ID[3];  // Section 48.1
 
 static struct Ringbuffer usart2tx;
 void					 USART2_Handler(void) { usart_irq_handler(&USART2, &usart2tx); }
-size_t					 u2puts(const char *buf, size_t len) { return usart_puts(&USART2, &usart2tx, buf, len); }
+static size_t			 u2puts(const char *buf, size_t len) { return usart_puts(&USART2, &usart2tx, buf, len); }
+static size_t            usb_puts(const char *buf, size_t len) { return usb_send(buf, len); }
 
 void TIM3_Handler(void) {
 	if ((TIM3.SR & TIM1_SR_UIF) == 0) {
@@ -53,8 +56,21 @@ void TIM3_Handler(void) {
 	}
 	TIM3.SR &= ~TIM1_SR_UIF;
 	static int i = 0;
-	cbprintf(u2puts, "%lld: bingo %d\n", cycleCount(), i++);
+	cbprintf(u2puts, "%lld: bingo %d\n", cycleCount(), i);
+	cbprintf(usb_puts, "%lld: bingo %d\n", cycleCount(), i++);
 	led0_toggle();
+}
+
+void USB_LP_Handler(void) {
+        uint64_t now = cycleCount();
+        led0_toggle();
+        static int i = 0;
+        cbprintf(u2puts, "%lld IRQ %i: %s\n", now / C_US, i++, usb_state_str(usb_state()));
+        uint8_t buf[64];
+        size_t  len = usb_recv(buf, sizeof buf);
+        if (len > 0) {
+                cbprintf(u2puts, "received %i: %*s\n", len, len, buf);
+        }
 }
 
 static const char* clksrcstr[] = { "RSV", "HSI", "HSE", "PLL" };
@@ -70,7 +86,7 @@ void main(void) {
 		NVIC_SetPriority(irqprios[i].irq, irqprios[i].prio);
 	}
 
-	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM3EN;
+	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_TIM3EN | RCC_APB1ENR1_USBEN;
 	RCC.APB1ENR1 |= RCC_APB1ENR1_USART2EN;
 	RCC.AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN;
 
@@ -101,9 +117,23 @@ void main(void) {
 	TIM3.CR1 |= TIM1_CR1_CEN;
 	NVIC_EnableIRQ(TIM3_IRQn);
 
-	RCC.APB1ENR1 |= RCC_APB1ENR1_PWREN;	 // WAS THIS IT? NO!
-	PWR.CR3 |= PWR_CR3_UCPD1_DBDIS;
+#if 1
+    // use HSI48 + clock recovery system for the USB clock
+	RCC.APB1ENR1 |= RCC_APB1ENR1_CRSEN;
+	RCC.CRRCR |= RCC_CRRCR_HSI48ON;
+	while((RCC.CRRCR & RCC_CRRCR_HSI48RDY) == 0)
+		__NOP();
+	crs_cfgr_set_syncsrc(&CRS, 2);  // USB SOF frames
+	crs_cfgr_set_syncdiv(&CRS, 0);  // undivided
+	crs_cfgr_set_felim(&CRS, 0x22);   // default
+	crs_cfgr_set_reload(&CRS, (48000000/1000)-1);   // 48MHz/1KHz
+	crs_cr_set_trim(&CRS, 0x40);
+	CRS.CR |= CRS_CR_AUTOTRIMEN | CRS_CR_CEN;
+	rcc_ccipr_set_clk48sel(&RCC, 0); // 7.4.26, p.328:  0: HSI48, 2:PLLQ other reserved
+#endif
 
+	usb_init();
+	NVIC_EnableIRQ(USB_LP_IRQn);
 
 	for (;;) {
 		__WFI();  // wait for interrupt to change the state of any of the subsystems

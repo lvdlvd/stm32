@@ -30,6 +30,12 @@ void Reset_Handler(void) {
 	// enable usage/bus/mem fault separate handlers.
 	SCB.SHCSR |= SCB_SHCSR_USGFAULTENA | SCB_SHCSR_BUSFAULTENA | SCB_SHCSR_MEMFAULTENA;
 
+	fpu_cpacr_cpacr_set_cp(&FPU_CPACR, 0xf); /* CP10/CP11 Full Access */
+
+	/* Disable all interrupts and clear pending bits  */
+	RCC.CIER = 0;
+	RCC.CICR = RCC.CIFR;
+
 	RCC.CR |= RCC_CR_HSEON;
 	for (int i = 0; i < HSE_RDY_TIMEOUT; i++) {
 		if (RCC.CR & RCC_CR_HSERDY) {
@@ -40,6 +46,11 @@ void Reset_Handler(void) {
 	RCC.APB1ENR1 |= RCC_APB1ENR1_PWREN;
 	pwr_cr1_set_vos(&PWR, 1);	 // Voltage Scaling range 1 (fast)
 	PWR.CR5 &= ~PWR_CR5_R1MODE;	 // bit off = boost mode.
+
+	// USB Type-C and Power Delivery Dead Battery disable. After exiting reset, the USB Type-C “dead battery” behavior is enabled,
+	// which may have a pull-down effect on CC1 and CC2 pins. It is recommended to disable it in all cases, either to stop this
+	// pull-down or to hand over control to the UCPD1 (which should therefore be initialized before doing the disable).
+	PWR.CR3 |= PWR_CR3_UCPD1_DBDIS;
 
 	// Configure the main PLL
 	if ((RCC.CR & RCC_CR_HSERDY) == 0) {
@@ -53,9 +64,13 @@ void Reset_Handler(void) {
 
 	rcc_pllcfgr_set_plln(&RCC, 36);	 // 8...127     : vco_out = vco_in * n = 96...344MHz    8 * 36 = 288MHz
 	rcc_pllcfgr_set_pllr(&RCC, 0);	 // 0,1,2,3 -> p=2,4,6,8  : sysclk = vco_out / p <= 170MHz  8 * 36 / 2 = 144MHz
+//	rcc_pllcfgr_set_pllq(&RCC, 2);   // 0,1,2,3 -> p=2,4,6,8  :   8 * 36 / 6 =  48MHz
 
+//	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN | RCC_PLLCFGR_PLLQEN;
 	RCC.PLLCFGR |= RCC_PLLCFGR_PLLREN;
 	RCC.CR |= RCC_CR_PLLON;
+
+//	rcc_ccipr_set_clk48sel(&RCC, 2);  // 7.4.26, p.328:  0: HSI48, 2:PLLQ other reserved
 
 	FLASH.ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
 	flash_acr_set_latency(&FLASH, 4);  // 4 wait states (5 cycles) cpf p.150 table 19

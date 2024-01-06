@@ -2,7 +2,7 @@
  * Devices for the STM32G431 subfamily
  */
 
-
+    CRS     = 0x40002000;
 	DBGMCU	= 0xE0042000;
 	EXTI	= 0x40010400;
 	FLASH	= 0x40022000;
@@ -39,5 +39,6 @@
 	USART1	= 0x40013800;
 	USART2	= 0x40004400;
 	USART3	= 0x40004800;
+    USB_FS_device   = 0x40005C00;
 	WWDG	= 0x40002C00;
 

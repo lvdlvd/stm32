@@ -8,7 +8,10 @@ MEMORY
 
 INCLUDE devs.ld
 
-GPIO_ALL = GPIOA;
+USB     = USB_FS_device;        /* require for stm32g4xxusb.h */
+USB_PMA = 0x40006000;
+
+GPIO_ALL = GPIOA;               /* required for gpio.h */
 UNIQUE_DEVICE_ID = 0x1FFF7590;  /* ref manual 4.1 */
 
 /* Highest address of the user mode stack */
