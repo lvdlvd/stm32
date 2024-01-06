@@ -24,6 +24,7 @@ static inline void systemInit(void) {
 }
 
 enum { 
+	HSE_FREQ_MHZ 	= 8,     // nucleo board: 24MHz, canard: 8MHz
 	HSE_FREQ_MHZ 	= 24,     // nucleo board: 24MHz, canard: 8MHz
 	HSE_RDY_TIMEOUT = 5000, 
 };

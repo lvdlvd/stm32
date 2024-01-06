@@ -8,6 +8,9 @@
 #include "cortex_m4.h"
 #include "stm32g4usb.h"
 
+#include "printf.h"
+extern size_t u2puts(const char *buf, size_t len);
+
 static enum usb_state_t _usb_state		 = USB_UNATTACHED;
 //static enum usb_state_t _usb_state_saved = USB_UNATTACHED;	// when state is suspended, the state to return to on wakeup
 
@@ -108,6 +111,8 @@ size_t usb_recv(uint8_t *buf, size_t sz) {
 	USB.ISTR &= ~(USB_ISTR_SOF | USB_ISTR_ESOF | USB_ISTR_ERR | USB_ISTR_PMAOVR | USB_ISTR_L1REQ);
 
 	// the other ISTR bits are r or rc_w0, meaning to clear them write ~bit to the register, avoid read-mod-write.
+
+	cbprintf(u2puts, "istr: 0x%x\n", istr);
 
 	if (istr & USB_ISTR_RESET) {
 
