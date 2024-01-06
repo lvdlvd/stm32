@@ -46,7 +46,7 @@ func (d *Device) PeripheralType(s string) *Peripheral {
 	return p
 }
 
-var renameMap = map[string]string{"UART4": "USART", "CAN1": "CAN"}
+var renameMap = map[string]string{}
 
 func (d *Device) TypeName(s string) string {
 	n := d.PeripheralType(s)
@@ -119,6 +119,9 @@ func (p *Peripheral) FillRegisters() {
 	}
 	p.Registers = r
 }
+
+// there's only one device of this type, (so we can omit the argument from the accessor functions)
+func (p *Peripheral) IsSingleton() bool { return p.DerivedFrom == "" && len(p.Others) == 0 }
 
 type Interrupt struct {
 	Name        string `xml:"name"`
@@ -413,6 +416,26 @@ func main() {
 		}
 	}
 
+	// fill the renameMap: for every device xxxx, if all xxxxNN are the same type, call the type xxxx
+	namestemtotype := map[string]map[string]bool{}
+	for _, v := range device.Peripherals {
+		n := nameStem(v.Name)
+		t := device.PeripheralType(v.Name).Name
+		if namestemtotype[n] == nil {
+			namestemtotype[n] = map[string]bool{t: true}
+		} else {
+			namestemtotype[n][t] = true
+		}
+	}
+	for k, v := range namestemtotype {
+		if len(v) == 1 {
+			for kk, _ := range v {
+				renameMap[kk] = k
+			}
+		}
+
+	}
+
 	if err := tmpl.Execute(os.Stdout, &device); err != nil {
 		log.Fatal(err)
 	}
@@ -449,6 +472,13 @@ func isSuperset(big, small *Peripheral) bool {
 
 func nameTemplate(s string) string {
 	return strings.Join(strings.FieldsFunc(s+" ", unicode.IsDigit), "X")
+}
+
+func nameStem(s string) string {
+	if strings.HasPrefix(s, "I2C") { // hack
+		return "I2C"
+	}
+	return strings.Join(strings.FieldsFunc(s, unicode.IsDigit), "")
 }
 
 var listTmpl = `
