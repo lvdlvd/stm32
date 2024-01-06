@@ -41,7 +41,8 @@ enum IRQn_Type {
 {{- range .Peripherals}}
 {{- if .Registers}}
 {{- if .Description}}
-/* {{.Description}} */
+/* {{.Description}}{{if .IsSingleton}}
+There is only one peripheral of type {{$.TypeName .Name}}.{{end}} */
 {{- end}}
 struct {{$.TypeName .Name}}_Type {
 {{- range .Registers}}
@@ -58,6 +59,7 @@ struct {{$.TypeName .Name}}_Type {
 {{- end}}
 };
 {{- $pname := $.TypeName .Name}}
+{{- $iss := .IsSingleton}}
 {{- range .Registers}}
 	{{- $rname := .Name}}
 	{{- $regwidth := .Size}}
@@ -78,14 +80,14 @@ enum {
 {{- if ne .Access "read-only"}}
 {{- range .Fields}}
 	{{- if ne .BitWidth $regwidth}}{{if gt .BitWidth 1}}
-inline void {{lower $pname}}_{{lower $rname}}_set_{{lower .Name}}(struct {{$pname}}_Type* p, uint32_t val) { p->{{$rname}} = (p->{{$rname}} & ~{{upper $pname}}_{{upper $rname}}_{{upper .Name}}) | ((val<<{{.BitOffset}}) & {{upper $pname}}_{{upper $rname}}_{{upper .Name}}); }
+static inline void {{lower $pname}}_{{lower $rname}}_set_{{lower .Name}}({{if not $iss}}struct {{$pname}}_Type* p, {{end}}uint32_t val) { {{if $iss}}{{$pname}}.{{else}}p->{{end}}{{$rname}} = (p->{{$rname}} & ~{{upper $pname}}_{{upper $rname}}_{{upper .Name}}) | ((val<<{{.BitOffset}}) & {{upper $pname}}_{{upper $rname}}_{{upper .Name}}); }
 	{{- end}}{{end}}
 {{- end}}		
 {{- end}}		
 {{- range .Fields}}
 	{{- if ne .BitWidth $regwidth}}
 		{{- if gt .BitWidth 1}}
-inline uint32_t {{lower $pname}}_{{lower $rname}}_get_{{lower .Name}}(struct {{$pname}}_Type* p) { return (p->{{$rname}} & {{upper $pname}}_{{upper $rname}}_{{upper .Name}}) >> {{.BitOffset}} ; }
+static inline uint32_t {{lower $pname}}_{{lower $rname}}_get_{{lower .Name}}({{if not $iss}}struct {{$pname}}_Type* p{{else}}void{{end}}) { return ({{if $iss}}{{$pname}}.{{else}}p->{{end}}{{$rname}}{{$rname}} & {{upper $pname}}_{{upper $rname}}_{{upper .Name}}) >> {{.BitOffset}} ; }
 		{{- end}}
 	{{- end}}
 {{- end}}		
@@ -96,7 +98,7 @@ inline uint32_t {{lower $pname}}_{{lower $rname}}_get_{{lower .Name}}(struct {{$
 {{- $dname := $.TypeName .Name}}
 // Valid Casts:
 {{range .Extends}} 
-inline struct {{$.TypeName .Name}}_Type* {{$dname}}_as_{{$.TypeName .Name}}_Type(struct {{$dname}}_Type* p) { return (struct {{$.TypeName .Name}}_Type*)p; }
+static inline struct {{$.TypeName .Name}}_Type* {{$dname}}_as_{{$.TypeName .Name}}_Type(struct {{$dname}}_Type* p) { return (struct {{$.TypeName .Name}}_Type*)p; }
 {{end}}
 {{end}}
 {{- end}}
