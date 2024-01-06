@@ -59,13 +59,10 @@ struct {{$.TypeName .Name}}_Type {
 {{- end}}
 };
 {{- if .BaseAddress}}
-
-{{- if .DerivedFrom}}
-extern struct {{$.TypeName .DerivedFrom}}_Type 	{{.Name}};	// @{{.BaseAddress.Hex}}
-{{- else}}
 extern struct {{$.TypeName .Name}}_Type	{{.Name}};	// @{{.BaseAddress.Hex}} {{if .Extends}}Also:{{range .Extends}} {{$.TypeName .Name}}_Type{{end}}{{end}}
 {{- end}}
-
+{{- range .Others}}
+extern struct {{$.TypeName .DerivedFrom}}_Type 	{{.Name}};	// @{{.BaseAddress.Hex}}
 {{- end}}
 {{- $pname := $.TypeName .Name}}
 {{- $iss := .IsSingleton}}
@@ -116,7 +113,3 @@ static inline struct {{$.TypeName .Name}}_Type* {{$dname}}_as_{{$.TypeName .Name
 #undef __I
 #undef __O
 #undef __IO
-
-{{range .Peripherals}}
-{{- end}}
-
