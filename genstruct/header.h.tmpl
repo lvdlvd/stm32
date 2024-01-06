@@ -58,8 +58,18 @@ struct {{$.TypeName .Name}}_Type {
 {{- end}}
 {{- end}}
 };
+{{- if .BaseAddress}}
+
+{{- if .DerivedFrom}}
+extern struct {{$.TypeName .DerivedFrom}}_Type 	{{.Name}};	// @{{.BaseAddress.Hex}}
+{{- else}}
+extern struct {{$.TypeName .Name}}_Type	{{.Name}};	// @{{.BaseAddress.Hex}} {{if .Extends}}Also:{{range .Extends}} {{$.TypeName .Name}}_Type{{end}}{{end}}
+{{- end}}
+
+{{- end}}
 {{- $pname := $.TypeName .Name}}
 {{- $iss := .IsSingleton}}
+{{- $dname := .Name}}
 {{- range .Registers}}
 	{{- $rname := .Name}}
 	{{- $regwidth := .Size}}
@@ -80,14 +90,14 @@ enum {
 {{- if ne .Access "read-only"}}
 {{- range .Fields}}
 	{{- if ne .BitWidth $regwidth}}{{if gt .BitWidth 1}}
-static inline void {{lower $pname}}_{{lower $rname}}_set_{{lower .Name}}({{if not $iss}}struct {{$pname}}_Type* p, {{end}}uint32_t val) { {{if $iss}}{{$pname}}.{{else}}p->{{end}}{{$rname}} = (p->{{$rname}} & ~{{upper $pname}}_{{upper $rname}}_{{upper .Name}}) | ((val<<{{.BitOffset}}) & {{upper $pname}}_{{upper $rname}}_{{upper .Name}}); }
+static inline void {{lower $pname}}_{{lower $rname}}_set_{{lower .Name}}({{if not $iss}}struct {{$pname}}_Type* p, {{end}}uint32_t val) { {{if $iss}}{{$dname}}.{{else}}p->{{end}}{{$rname}} = ({{if $iss}}{{$dname}}.{{else}}p->{{end}}{{$rname}} & ~{{upper $pname}}_{{upper $rname}}_{{upper .Name}}) | ((val<<{{.BitOffset}}) & {{upper $pname}}_{{upper $rname}}_{{upper .Name}}); }
 	{{- end}}{{end}}
 {{- end}}		
 {{- end}}		
 {{- range .Fields}}
 	{{- if ne .BitWidth $regwidth}}
 		{{- if gt .BitWidth 1}}
-static inline uint32_t {{lower $pname}}_{{lower $rname}}_get_{{lower .Name}}({{if not $iss}}struct {{$pname}}_Type* p{{else}}void{{end}}) { return ({{if $iss}}{{$pname}}.{{else}}p->{{end}}{{$rname}}{{$rname}} & {{upper $pname}}_{{upper $rname}}_{{upper .Name}}) >> {{.BitOffset}} ; }
+static inline uint32_t {{lower $pname}}_{{lower $rname}}_get_{{lower .Name}}({{if not $iss}}struct {{$pname}}_Type* p{{else}}void{{end}}) { return ({{if $iss}}{{$dname}}.{{else}}p->{{end}}{{$rname}} & {{upper $pname}}_{{upper $rname}}_{{upper .Name}}) >> {{.BitOffset}} ; }
 		{{- end}}
 	{{- end}}
 {{- end}}		
@@ -108,12 +118,5 @@ static inline struct {{$.TypeName .Name}}_Type* {{$dname}}_as_{{$.TypeName .Name
 #undef __IO
 
 {{range .Peripherals}}
-{{- if .BaseAddress}}
-{{- if .DerivedFrom}}
-extern struct {{$.TypeName .DerivedFrom}}_Type 	{{.Name}};	// @{{.BaseAddress.Hex}}
-{{- else}}
-extern struct {{$.TypeName .Name}}_Type	{{.Name}};	// @{{.BaseAddress.Hex}} {{if .Extends}}Also:{{range .Extends}} {{$.TypeName .Name}}_Type{{end}}{{end}}
-{{- end}}
-{{- end}}
 {{- end}}
 
