@@ -17632,6 +17632,43 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
             </field>
           </fields>
         </register>
+
+        <register>
+          <name>OR1</name>
+          <displayName>OR1</displayName>
+          <description>Option Register 1</description>
+          <addressOffset>0x50</addressOffset>
+          <size>0x20</size>
+          <access>read-write</access>
+          <resetValue>0x0000</resetValue>
+          <fields>
+            <field>
+              <name>TI1_RMP</name>
+              <description>0: TIM15 input capture 1 is connected to I/O 1: TIM15 input capture 1 is connected to LSE</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>1</bitWidth>
+            </field>
+            <field>
+              <name>ENCMODE</name>
+              <description>00: No redirection
+01:TIM2 IC1 and TIM2 IC2 are connected to TIM15 IC1 and TIM15 IC2 respectively 10:Reserved
+11:Reserved</description>
+              <bitOffset>1</bitOffset>
+              <bitWidth>2</bitWidth>
+            </field>
+          </fields>
+        </register>
+
+        <register>
+          <name>OR2</name>
+          <displayName>OR2</displayName>
+          <description>Option Register 2</description>
+          <addressOffset>0x60</addressOffset>
+          <size>0x20</size>
+          <access>read-write</access>
+          <resetValue>0x0000</resetValue>
+        </register>
+
       </registers>
     </peripheral>
     <peripheral>
@@ -18293,6 +18330,7 @@ xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_1.xsd">
             </field>
           </fields>
         </register>
+
       </registers>
     </peripheral>
     <peripheral>
