@@ -87,14 +87,14 @@ func (p *Peripheral) FillRegisters() {
 	ridx := 0
 	for _, v := range p.Registers {
 
-		if len(v.Fields) > 0 {
-			switch {
-			case v.Fields[0].BitOffset+v.Fields[0].BitWidth <= 8:
-				v.Size = 8
-			case v.Fields[0].BitOffset+v.Fields[0].BitWidth <= 16:
-				v.Size = 16
-			}
-		}
+		// if len(v.Fields) > 0 {
+		// 	switch {
+		// 	case v.Fields[0].BitOffset+v.Fields[0].BitWidth <= 8:
+		// 		v.Size = 8
+		// 	case v.Fields[0].BitOffset+v.Fields[0].BitWidth <= 16:
+		// 		v.Size = 16
+		// 	}
+		// }
 
 		// same address as previous: generate union field
 		if len(r) > 1 && v.AddressOffset == r[len(r)-1].AddressOffset {
