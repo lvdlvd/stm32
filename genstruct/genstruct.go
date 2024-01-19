@@ -390,6 +390,9 @@ func main() {
 			if k1 == k2 {
 				continue
 			}
+			if v1.DerivedFrom != "" {
+				continue
+			}
 			if v2.DerivedFrom != "" {
 				continue
 			}
@@ -419,8 +422,16 @@ func main() {
 	// fill the renameMap: for every device xxxx, if all xxxxNN are the same type, call the type xxxx
 	namestemtotype := map[string]map[string]bool{}
 	for _, v := range device.Peripherals {
+
+		// GPIO[A..H] are the only ones that dont follow the stem.digit format
+		// don't rename them
+		if strings.HasPrefix(v.Name, "GPIO") {
+			continue
+		}
+
 		n := nameStem(v.Name)
 		t := device.PeripheralType(v.Name).Name
+		//		log.Println("type", v.Name, "stem", n, "is", t)
 		if namestemtotype[n] == nil {
 			namestemtotype[n] = map[string]bool{t: true}
 		} else {
@@ -430,6 +441,7 @@ func main() {
 	for k, v := range namestemtotype {
 		if len(v) == 1 {
 			for kk, _ := range v {
+				//				log.Println("rename", kk, "to", k)
 				renameMap[kk] = k
 			}
 		}
