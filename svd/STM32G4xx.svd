@@ -20927,64 +20927,16 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitWidth>1</bitWidth>
                   </field>
                   <field>
-                     <name>DEAT4</name>
-                     <description>Driver Enable assertion               time</description>
-                     <bitOffset>25</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEAT3</name>
-                     <description>DEAT3</description>
-                     <bitOffset>24</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEAT2</name>
-                     <description>DEAT2</description>
-                     <bitOffset>23</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEAT1</name>
-                     <description>DEAT1</description>
-                     <bitOffset>22</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEAT0</name>
-                     <description>DEAT0</description>
+                     <name>DEAT</name>
+                     <description>Driver Enable Assertion Time</description>
                      <bitOffset>21</bitOffset>
-                     <bitWidth>1</bitWidth>
+                     <bitWidth>5</bitWidth>
                   </field>
                   <field>
-                     <name>DEDT4</name>
-                     <description>Driver Enable de-assertion               time</description>
-                     <bitOffset>20</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEDT3</name>
-                     <description>DEDT3</description>
-                     <bitOffset>19</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEDT2</name>
-                     <description>DEDT2</description>
-                     <bitOffset>18</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEDT1</name>
-                     <description>DEDT1</description>
-                     <bitOffset>17</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEDT0</name>
-                     <description>DEDT0</description>
+                     <name>DEDT</name>
+                     <description>Driver Enable Deassertion Time</description>
                      <bitOffset>16</bitOffset>
-                     <bitWidth>1</bitWidth>
+                     <bitWidth>5</bitWidth>
                   </field>
                   <field>
                      <name>OVER8</name>
@@ -21905,64 +21857,16 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitWidth>1</bitWidth>
                   </field>
                   <field>
-                     <name>DEAT4</name>
-                     <description>Driver Enable assertion               time</description>
-                     <bitOffset>25</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEAT3</name>
-                     <description>DEAT3</description>
-                     <bitOffset>24</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEAT2</name>
-                     <description>DEAT2</description>
-                     <bitOffset>23</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEAT1</name>
-                     <description>DEAT1</description>
-                     <bitOffset>22</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEAT0</name>
-                     <description>DEAT0</description>
+                     <name>DEAT</name>
+                     <description>Driver Enable Assertion Time</description>
                      <bitOffset>21</bitOffset>
-                     <bitWidth>1</bitWidth>
+                     <bitWidth>5</bitWidth>
                   </field>
                   <field>
-                     <name>DEDT4</name>
-                     <description>Driver Enable de-assertion               time</description>
-                     <bitOffset>20</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEDT3</name>
-                     <description>DEDT3</description>
-                     <bitOffset>19</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEDT2</name>
-                     <description>DEDT2</description>
-                     <bitOffset>18</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEDT1</name>
-                     <description>DEDT1</description>
-                     <bitOffset>17</bitOffset>
-                     <bitWidth>1</bitWidth>
-                  </field>
-                  <field>
-                     <name>DEDT0</name>
-                     <description>DEDT0</description>
+                     <name>DEDT</name>
+                     <description>Driver Enable Deassertion Time</description>
                      <bitOffset>16</bitOffset>
-                     <bitWidth>1</bitWidth>
+                     <bitWidth>5</bitWidth>
                   </field>
                   <field>
                      <name>OVER8</name>
