@@ -12,7 +12,7 @@ void default_IRQ_Handler(void) {
 // Core fault handlers
 void Reset_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void NonMaskableInt_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
-void Reserved_3_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
+void HardFault_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void MemoryManagement_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void BusFault_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
 void UsageFault_Handler(void) __attribute__((weak, alias("default_IRQ_Handler")));
@@ -35,7 +35,7 @@ __attribute__((section(".isr_vector"))) void (* const vector_table[])(void) = {
     _estack,
     Reset_Handler,
     NonMaskableInt_Handler,
-    Reserved_3_Handler,
+    HardFault_Handler,          // only on cortex M4 and up
     MemoryManagement_Handler,
     BusFault_Handler,
     UsageFault_Handler,

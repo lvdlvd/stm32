@@ -11,7 +11,7 @@ enum IRQn_Type {
 
 	//  Cortex-{{.CpuName}} Processor Exceptions Numbers 
 	NonMaskableInt_IRQn   = -14, // 2 Non Maskable Interrupt                           
-	Reserved_3_IRQn       = -13,
+	HardFault_IRQn	      = -13, // 3 Hard Fault (Cortex M4 and up)
 	MemoryManagement_IRQn = -12, // 4 Memory Management Interrupt            
 	BusFault_IRQn         = -11, // 5 Bus Fault Interrupt                    
 	UsageFault_IRQn       = -10, // 6 Usage Fault Interrupt                  
