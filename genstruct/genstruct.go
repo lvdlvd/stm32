@@ -102,6 +102,10 @@ func (p *Peripheral) FillRegisters() {
 			continue
 		}
 
+		if v.Size == 0 {
+			log.Fatalf("Zero size field %s:%s [%d] at %d bit", p.Name, v.Name, v.Size, v.AddressOffset)
+		}
+
 		if v.AddressOffset%(v.Size/8) != 0 {
 			log.Fatalf("Unaligned field %s:%s [%d] at %d bit", p.Name, v.Name, v.Size, v.AddressOffset)
 		}
@@ -297,7 +301,8 @@ func main() {
 	for _, v := range device.Peripherals {
 		for _, w := range v.Registers {
 			if w.Size != 32 {
-				log.Println("%s %s register has bad size %d", v.Name, w.Name, w.Size)
+				log.Printf("%s %s register has bad size %d, patching to 32", v.Name, w.Name, w.Size)
+				w.Size = 32
 			}
 		}
 	}
