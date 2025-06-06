@@ -4,18 +4,18 @@
 
 #include "stm32g4xx.h"
 
-enum { CLOCKSPEED_HZ = 16000000ULL, C_US = CLOCKSPEED_HZ / 1000000 };
+enum { CLOCKSPEED_HZ = 168000000ULL, C_US = CLOCKSPEED_HZ / 1000000 };
 
 // For PCLK1 = 168 Mhz: 84MHz/(1<<0..7)
 enum spi_clock_div_t {
-	SPI_8MHz = 0,
-	SPI_4MHz = 1,
-	SPI_2MHz = 2,
-	SPI_1MHz = 3,
-	SPI_500KHz = 4,
-	SPI_250KHz = 5,
-	SPI_125KHz = 6,
-	SPI_63KHz = 7,
+	SPI_84MHz = 0,
+	SPI_42MHz = 1,
+	SPI_21MHz = 2,
+	SPI_10500KHz = 3,
+	SPI_5250KHz = 4,
+	SPI_2625KHz = 5,
+	SPI_1312KHz = 6,
+	SPI_656KHz = 7,
 };
 
 
