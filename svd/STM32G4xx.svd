@@ -35239,8 +35239,8 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                      <bitWidth>1</bitWidth>
                   </field>
                   <field>
-                     <name>AWDCH1CH</name>
-                     <description>AWDCH1CH</description>
+                     <name>AWD1CH</name>
+                     <description>Analog watchdog 1 channel selection (only available on ADC1) </description>
                      <bitOffset>26</bitOffset>
                      <bitWidth>5</bitWidth>
                   </field>
@@ -35325,15 +35325,15 @@ This bit is only valid for the main regulator in range 1 and has no effect on ra
                   <field>
                      <name>EXTSEL</name>
                      <description>EXTSEL</description>
-                     <bitOffset>6</bitOffset>
-                     <bitWidth>4</bitWidth>
+                     <bitOffset>5</bitOffset>
+                     <bitWidth>5</bitWidth>
                   </field>
-                  <field>
+                  <!-- field>
                      <name>ALIGN_5</name>
                      <description>ALIGN_5</description>
                      <bitOffset>5</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>
+                  </field -->
                   <field>
                      <name>RES</name>
                      <description>RES</description>
