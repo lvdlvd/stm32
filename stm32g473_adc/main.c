@@ -177,7 +177,7 @@ void main(void) {
 
 	ADC1.CR &= ~ADC_CR_DEEPPWD;      // end deep power down
 	ADC1.CR |= ADC_CR_ADVREGEN;      // enable voltage regulator
-	delay(25);                                      // DS11453 table 66
+	delay(25);                       // DS11453 table 66
 	ADC1.CR |= ADC_CR_ADCAL;         // start calibration
 	while (ADC1.CR & ADC_CR_ADCAL) {
 			__NOP();
@@ -202,7 +202,7 @@ void main(void) {
 	adc_smpr2_set_smp17(&ADC1, 7);   // 
 	adc_smpr2_set_smp18(&ADC1, 7);   // 
 	adc_cfgr_set_exten(&ADC1, 1);    // trigger on rising edge
-	adc_cfgr_set_extsel(&ADC1, 13);  // ext 13 is TIM6 TRGO (see below)
+	adc_cfgr_set_extsel(&ADC1, 13);  // ext 13 is TIM6 TRGO (see below), for some reason TIM4 doesnt work. 
 
 	ADC1.CFGR |= ADC_CFGR_AUTDLY;  // without this, more than 3 samples trigger an overflow error (this was hard to find)
 	ADC1.IER = ADC_IER_EOCIE;      // irq at end of conversion. the last one will also have EOS bit set, no need for extra IRQ
